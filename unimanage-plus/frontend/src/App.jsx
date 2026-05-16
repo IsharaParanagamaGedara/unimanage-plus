@@ -8,6 +8,8 @@ import LecturerDashboard from "./pages/LecturerDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
 
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
+
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
 };
@@ -20,6 +22,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<LoginPage />} />
 
+          {/* Admin Dashboard */}
           <Route
             path="/admin/dashboard"
             element={
@@ -29,6 +32,17 @@ function App() {
             }
           />
 
+          {/* Admin User Management */}
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminUsersPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Lecturer Dashboard */}
           <Route
             path="/lecturer/dashboard"
             element={
@@ -38,6 +52,7 @@ function App() {
             }
           />
 
+          {/* Student Dashboard */}
           <Route
             path="/student/dashboard"
             element={
@@ -47,6 +62,7 @@ function App() {
             }
           />
 
+          {/* Department Staff Dashboard */}
           <Route
             path="/staff/dashboard"
             element={
