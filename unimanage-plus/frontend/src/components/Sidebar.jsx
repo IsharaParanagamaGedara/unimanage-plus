@@ -1,73 +1,72 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/logo.png";
 import "./Sidebar.css";
 
 const linksByRole = {
   Admin: [
-    { label: "Dashboard", path: "/admin/dashboard" },
-    { label: "User Management", path: "/admin/users" },
-    { label: "Departments", path: "/admin/departments" },
-    { label: "Courses", path: "/admin/courses" },
-    { label: "Enrollments", path: "/admin/enrollments" },
-    { label: "Service Requests", path: "/admin/service-requests" },
-    { label: "Analytics", path: "/admin/analytics" },
-    { label: "Reports", path: "/admin/reports" },
-    { label: "Audit Logs", path: "/admin/audit-logs" },
+    { label: "Dashboard", path: "/admin/dashboard", icon: "🏠" },
+    { label: "User Management", path: "/admin/users", icon: "👥" },
+    { label: "Departments", path: "/admin/departments", icon: "🏢" },
+    { label: "Courses", path: "/admin/courses", icon: "📚" },
+    { label: "Enrollments", path: "/admin/enrollments", icon: "📝" },
+    { label: "Service Requests", path: "/admin/service-requests", icon: "📩" },
+    { label: "Analytics", path: "/admin/analytics", icon: "📊" },
+    { label: "Reports", path: "/admin/reports", icon: "📄" },
+    { label: "Audit Logs", path: "/admin/audit-logs", icon: "🛡️" },
   ],
   Lecturer: [
-    { label: "Dashboard", path: "/lecturer/dashboard" },
-    { label: "My Courses", path: "/lecturer/courses" },
-    { label: "Assignments", path: "/lecturer/assignments" },
-    { label: "Submissions", path: "/lecturer/submissions" },
+    { label: "Dashboard", path: "/lecturer/dashboard", icon: "🏠" },
+    { label: "My Courses", path: "/lecturer/courses", icon: "📚" },
+    { label: "Assignments", path: "/lecturer/assignments", icon: "📝" },
+    { label: "Submissions", path: "/lecturer/submissions", icon: "📤" },
   ],
   Student: [
-    { label: "Dashboard", path: "/student/dashboard" },
-    { label: "Browse Courses", path: "/student/courses" },
-    { label: "My Enrollments", path: "/student/enrollments" },
-    { label: "Assignments", path: "/student/assignments" },
-    { label: "Service Requests", path: "/student/service-requests" },
+    { label: "Dashboard", path: "/student/dashboard", icon: "🏠" },
+    { label: "Browse Courses", path: "/student/courses", icon: "📚" },
+    { label: "My Enrollments", path: "/student/enrollments", icon: "✅" },
+    { label: "Assignments", path: "/student/assignments", icon: "📝" },
+    { label: "Service Requests", path: "/student/service-requests", icon: "📩" },
   ],
   "Department Staff": [
-    { label: "Dashboard", path: "/staff/dashboard" },
-    { label: "Service Requests", path: "/staff/service-requests" },
-    { label: "Students", path: "/staff/students" },
-    { label: "Reports", path: "/staff/reports" },
+    { label: "Dashboard", path: "/staff/dashboard", icon: "🏠" },
+    { label: "Service Requests", path: "/staff/service-requests", icon: "📩" },
+    { label: "Students", path: "/staff/students", icon: "🎓" },
+    { label: "Reports", path: "/staff/reports", icon: "📄" },
   ],
 };
 
-const Sidebar = ({ isOpen, closeSidebar }) => {
+const Sidebar = () => {
   const { user } = useAuth();
   const links = linksByRole[user?.role] || [];
 
   return (
-    <>
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
-        <div className="sidebar-brand">
-          <div className="brand-icon">U+</div>
-          <div>
-            <h2>UniManage</h2>
-            <p>Plus</p>
-          </div>
+    <aside className="sidebar">
+      <div className="sidebar-brand">
+        <img src={logo} alt="UniManage Plus Logo" className="sidebar-logo" />
+
+        <div className="brand-text">
+          <h2>UniManage</h2>
+          <p>Plus</p>
         </div>
+      </div>
 
-        <nav className="sidebar-nav">
-          {links.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              onClick={closeSidebar}
-              className={({ isActive }) =>
-                isActive ? "sidebar-link active" : "sidebar-link"
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-      </aside>
-
-      {isOpen && <div className="sidebar-overlay" onClick={closeSidebar}></div>}
-    </>
+      <nav className="sidebar-nav">
+        {links.map((link) => (
+          <NavLink
+            key={link.path}
+            to={link.path}
+            title={link.label}
+            className={({ isActive }) =>
+              isActive ? "sidebar-link active" : "sidebar-link"
+            }
+          >
+            <span className="sidebar-icon">{link.icon}</span>
+            <span className="sidebar-label">{link.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+    </aside>
   );
 };
 

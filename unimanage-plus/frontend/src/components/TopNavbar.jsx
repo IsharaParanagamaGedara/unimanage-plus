@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./TopNavbar.css";
 
-const TopNavbar = ({ toggleSidebar }) => {
+const TopNavbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -13,10 +13,6 @@ const TopNavbar = ({ toggleSidebar }) => {
 
   return (
     <header className="top-navbar">
-      <button className="menu-btn" onClick={toggleSidebar}>
-        ☰
-      </button>
-
       <div>
         <h3>Dashboard</h3>
         <p>{user?.role}</p>

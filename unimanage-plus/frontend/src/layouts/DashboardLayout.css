@@ -8,6 +8,7 @@
   flex: 1;
   margin-left: 260px;
   min-width: 0;
+  transition: margin-left 0.3s ease;
 }
 
 .dashboard-content {
@@ -16,7 +17,7 @@
 
 @media (max-width: 900px) {
   .dashboard-main {
-    margin-left: 0;
+    margin-left: 88px;
   }
 
   .dashboard-content {

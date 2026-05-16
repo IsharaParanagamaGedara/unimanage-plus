@@ -22,16 +22,6 @@
   font-size: 13px;
 }
 
-.menu-btn {
-  display: none;
-  border: none;
-  background: var(--primary);
-  color: white;
-  padding: 8px 11px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
 .top-actions {
   display: flex;
   align-items: center;
@@ -86,16 +76,16 @@
   cursor: pointer;
 }
 
-@media (max-width: 900px) {
-  .menu-btn {
-    display: block;
-  }
-
+@media (max-width: 650px) {
   .user-info {
     display: none;
   }
 
   .top-navbar {
     padding: 0 16px;
+  }
+
+  .logout-btn {
+    padding: 8px 10px;
   }
 }
