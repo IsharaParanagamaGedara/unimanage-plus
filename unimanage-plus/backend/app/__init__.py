@@ -14,6 +14,9 @@ def create_app():
     from app.routes.auth_routes import auth_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
+    from app.routes.admin_user_routes import admin_user_bp
+    app.register_blueprint(admin_user_bp, url_prefix="/api/admin")
+
     @app.route("/api/health")
     def health_check():
         return {
