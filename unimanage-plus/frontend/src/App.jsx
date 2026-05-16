@@ -9,6 +9,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
 
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
+import AdminDepartmentsPage from "./pages/admin/AdminDepartmentsPage";
 
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
@@ -38,6 +39,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <AdminUsersPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Department Management */}
+          <Route
+            path="/admin/departments"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminDepartmentsPage />
               </ProtectedRoute>
             }
           />
