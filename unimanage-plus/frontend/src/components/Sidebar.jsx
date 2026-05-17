@@ -9,6 +9,7 @@ const linksByRole = {
     { label: "User Management", path: "/admin/users", icon: "👥" },
     { label: "Departments", path: "/admin/departments", icon: "🏢" },
     { label: "Courses", path: "/admin/courses", icon: "📚" },
+    { label: "Course Batches", path: "/admin/course-batches", icon: "🗓️" },
     { label: "Enrollments", path: "/admin/enrollments", icon: "📝" },
     { label: "Service Requests", path: "/admin/service-requests", icon: "📩" },
     { label: "Analytics", path: "/admin/analytics", icon: "📊" },
