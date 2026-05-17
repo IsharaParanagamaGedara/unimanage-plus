@@ -38,6 +38,9 @@ class CourseMaterialService:
         if not course:
             return None, "Course not found"
 
+        if not course.is_active:
+            return None, "Cannot upload materials to an inactive course"
+
         title = form_data.get("title", "").strip()
         description = form_data.get("description", "").strip()
 

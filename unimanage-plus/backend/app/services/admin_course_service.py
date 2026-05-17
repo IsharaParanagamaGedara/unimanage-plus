@@ -124,6 +124,9 @@ class AdminCourseService:
         if not course:
             return None, "Course not found"
 
+        if not course.is_active:
+            return None, "Cannot modify an inactive course"
+
         department_id = data.get("department_id", course.department_id)
         lecturer_id = data.get("lecturer_id", course.lecturer_id)
 

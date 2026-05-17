@@ -8,6 +8,13 @@ import {
   updateCourseStatus,
   getActiveLecturers,
 } from "../../services/adminCourseService";
+import {
+  getCourseMaterials,
+  uploadCourseMaterial,
+  updateCourseMaterial,
+  updateCourseMaterialStatus,
+  downloadCourseMaterial,
+} from "../../services/courseMaterialService";
 import "./AdminCoursesPage.css";
 
 const initialForm = {
@@ -18,6 +25,12 @@ const initialForm = {
   description: "",
   credits: "",
   capacity: "",
+};
+
+const initialMaterialForm = {
+  title: "",
+  description: "",
+  file: null,
 };
 
 const AdminCoursesPage = () => {
@@ -34,6 +47,13 @@ const AdminCoursesPage = () => {
   const [form, setForm] = useState(initialForm);
   const [editingCourse, setEditingCourse] = useState(null);
   const [showForm, setShowForm] = useState(false);
+
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [materials, setMaterials] = useState([]);
+  const [showMaterialsModal, setShowMaterialsModal] = useState(false);
+  const [materialLoading, setMaterialLoading] = useState(false);
+  const [editingMaterial, setEditingMaterial] = useState(null);
+  const [materialForm, setMaterialForm] = useState(initialMaterialForm);
 
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
@@ -72,6 +92,20 @@ const AdminCoursesPage = () => {
       setError(err?.response?.data?.message || "Failed to load courses.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMaterials = async (courseId) => {
+    try {
+      setMaterialLoading(true);
+      setError("");
+
+      const data = await getCourseMaterials(courseId);
+      setMaterials(data);
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to load course materials.");
+    } finally {
+      setMaterialLoading(false);
     }
   };
 
@@ -128,6 +162,119 @@ const AdminCoursesPage = () => {
     setShowForm(false);
     setEditingCourse(null);
     setForm(initialForm);
+  };
+
+  const openMaterialsModal = async (course) => {
+    setSelectedCourse(course);
+    setShowMaterialsModal(true);
+    setEditingMaterial(null);
+    setMaterialForm(initialMaterialForm);
+
+    await loadMaterials(course.id);
+  };
+
+  const closeMaterialsModal = () => {
+    setShowMaterialsModal(false);
+    setSelectedCourse(null);
+    setMaterials([]);
+    setEditingMaterial(null);
+    setMaterialForm(initialMaterialForm);
+  };
+
+  const handleMaterialFormChange = (e) => {
+    const { name, value, files } = e.target;
+
+    setMaterialForm((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
+  };
+
+  const handleMaterialSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setMaterialLoading(true);
+      setError("");
+      setMessage("");
+
+      if (editingMaterial) {
+        await updateCourseMaterial(editingMaterial.id, {
+          title: materialForm.title,
+          description: materialForm.description,
+        });
+
+        setMessage("Course material updated successfully.");
+      } else {
+        const formData = new FormData();
+        formData.append("title", materialForm.title);
+        formData.append("description", materialForm.description);
+        formData.append("file", materialForm.file);
+
+        await uploadCourseMaterial(selectedCourse.id, formData);
+
+        setMessage("Course material uploaded successfully.");
+      }
+
+      setEditingMaterial(null);
+      setMaterialForm(initialMaterialForm);
+
+      await loadMaterials(selectedCourse.id);
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to save course material.");
+    } finally {
+      setMaterialLoading(false);
+    }
+  };
+
+  const openEditMaterial = (material) => {
+    setEditingMaterial(material);
+    setMaterialForm({
+      title: material.title || "",
+      description: material.description || "",
+      file: null,
+    });
+  };
+
+  const cancelEditMaterial = () => {
+    setEditingMaterial(null);
+    setMaterialForm(initialMaterialForm);
+  };
+
+  const handleMaterialStatusChange = async (material) => {
+    const confirmMessage = material.is_active
+      ? "Are you sure you want to deactivate this material?"
+      : "Are you sure you want to activate this material?";
+
+    if (!window.confirm(confirmMessage)) return;
+
+    try {
+      setMaterialLoading(true);
+      setError("");
+      setMessage("");
+
+      await updateCourseMaterialStatus(material.id, !material.is_active);
+
+      setMessage(
+        material.is_active
+          ? "Course material deactivated successfully."
+          : "Course material activated successfully."
+      );
+
+      await loadMaterials(selectedCourse.id);
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to update material status.");
+    } finally {
+      setMaterialLoading(false);
+    }
+  };
+
+  const handleDownloadMaterial = async (material) => {
+    try {
+      await downloadCourseMaterial(material.id, material.file_name);
+    } catch (err) {
+      setError("Failed to download material.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -340,7 +487,18 @@ const AdminCoursesPage = () => {
                         <div className="action-buttons">
                           <button
                             className="secondary-btn small-btn"
+                            onClick={() => openMaterialsModal(course)}
+                            disabled={!course.is_active}
+                            title={!course.is_active ? "Inactive courses cannot manage materials" : ""}
+                          >
+                            Materials
+                          </button>
+
+                          <button
+                            className="secondary-btn small-btn"
                             onClick={() => openEditModal(course)}
+                            disabled={!course.is_active}
+                            title={!course.is_active ? "Inactive courses cannot be edited" : ""}
                           >
                             Edit
                           </button>
@@ -485,6 +643,148 @@ const AdminCoursesPage = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {showMaterialsModal && selectedCourse && (
+          <div className="modal-overlay">
+            <div className="materials-modal">
+              <div className="modal-header">
+                <div>
+                  <h2>Course Materials</h2>
+                  <p>
+                    {selectedCourse.course_code} - {selectedCourse.course_name}
+                  </p>
+                </div>
+
+                <button className="close-btn" onClick={closeMaterialsModal}>
+                  ×
+                </button>
+              </div>
+
+              <form onSubmit={handleMaterialSubmit} className="material-form">
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Material Title</label>
+                    <input
+                      name="title"
+                      value={materialForm.title}
+                      onChange={handleMaterialFormChange}
+                      placeholder="Week 01 Lecture Notes"
+                      required
+                    />
+                  </div>
+
+                  {!editingMaterial && (
+                    <div className="form-group">
+                      <label>File</label>
+                      <input
+                        name="file"
+                        type="file"
+                        accept=".pdf,.docx,.pptx,.zip"
+                        onChange={handleMaterialFormChange}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <div className="form-group full-width">
+                    <label>Description</label>
+                    <textarea
+                      name="description"
+                      value={materialForm.description}
+                      onChange={handleMaterialFormChange}
+                      placeholder="Brief description of the material..."
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-actions">
+                  {editingMaterial && (
+                    <button type="button" className="secondary-btn" onClick={cancelEditMaterial}>
+                      Cancel Edit
+                    </button>
+                  )}
+
+                  <button type="submit" className="primary-btn" disabled={materialLoading}>
+                    {materialLoading
+                      ? "Saving..."
+                      : editingMaterial
+                      ? "Update Material"
+                      : "Upload Material"}
+                  </button>
+                </div>
+              </form>
+
+              <div className="materials-list">
+                <h3>Uploaded Materials</h3>
+
+                {materialLoading ? (
+                  <p className="table-message">Loading materials...</p>
+                ) : materials.length === 0 ? (
+                  <p className="table-message">No materials uploaded yet.</p>
+                ) : (
+                  <div className="materials-grid">
+                    {materials.map((material) => (
+                      <div className="material-card" key={material.id}>
+                        <div className="material-top">
+                          <div className="file-icon">
+                            {material.file_type?.toUpperCase()}
+                          </div>
+
+                          <div>
+                            <h4>{material.title}</h4>
+                            <p>{material.description || "No description provided."}</p>
+                          </div>
+                        </div>
+
+                        <div className="material-meta">
+                          <span>{material.file_name}</span>
+                          <span>{material.file_size_mb} MB</span>
+                          <span>
+                            Uploaded by {material.uploader?.first_name}{" "}
+                            {material.uploader?.last_name}
+                          </span>
+                        </div>
+
+                        <div className="material-footer">
+                          <span className={material.is_active ? "status active" : "status inactive"}>
+                            {material.is_active ? "Active" : "Inactive"}
+                          </span>
+
+                          <div className="action-buttons">
+                            <button
+                              className="secondary-btn small-btn"
+                              onClick={() => handleDownloadMaterial(material)}
+                            >
+                              Download
+                            </button>
+
+                            <button
+                              className="secondary-btn small-btn"
+                              onClick={() => openEditMaterial(material)}
+                            >
+                              Edit
+                            </button>
+
+                            <button
+                              className={
+                                material.is_active
+                                  ? "danger-btn small-btn"
+                                  : "success-btn small-btn"
+                              }
+                              onClick={() => handleMaterialStatusChange(material)}
+                            >
+                              {material.is_active ? "Deactivate" : "Activate"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
