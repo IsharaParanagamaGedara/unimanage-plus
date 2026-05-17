@@ -8,3 +8,5 @@ from app.models.department_staff import DepartmentStaff
 from app.models.course import Course
 from app.models.course_material import CourseMaterial
 from app.models.course_batch import CourseBatch
+from app.models.course_application import CourseApplication
+from app.models.batch_enrollment import BatchEnrollment
