@@ -7,3 +7,4 @@ from app.models.lecturer import Lecturer
 from app.models.department_staff import DepartmentStaff
 from app.models.course import Course
 from app.models.course_material import CourseMaterial
+from app.models.course_batch import CourseBatch
