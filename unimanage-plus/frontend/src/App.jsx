@@ -10,6 +10,7 @@ import StaffDashboard from "./pages/StaffDashboard";
 
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminDepartmentsPage from "./pages/admin/AdminDepartmentsPage";
+import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
 
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
@@ -49,6 +50,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <AdminDepartmentsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Courses Management */}
+          <Route
+            path="/admin/courses"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminCoursesPage />
               </ProtectedRoute>
             }
           />
