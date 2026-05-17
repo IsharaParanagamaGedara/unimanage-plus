@@ -85,6 +85,9 @@ class AdminDepartmentService:
         if not department:
             return None, "Department not found"
 
+        if not department.is_active:
+            return None, "Inactive departments cannot be modified"
+
         name = data.get("name", department.name).strip()
         code = data.get("code", department.code).strip().upper()
         description = data.get("description", department.description or "").strip()

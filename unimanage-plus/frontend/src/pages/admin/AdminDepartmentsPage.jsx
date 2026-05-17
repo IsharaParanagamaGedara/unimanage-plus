@@ -255,6 +255,12 @@ const AdminDepartmentsPage = () => {
                           <button
                             className="secondary-btn small-btn"
                             onClick={() => openEditModal(department)}
+                            disabled={!department.is_active}
+                            title={
+                              !department.is_active
+                                ? "Inactive departments cannot be edited"
+                                : ""
+                            }
                           >
                             Edit
                           </button>
