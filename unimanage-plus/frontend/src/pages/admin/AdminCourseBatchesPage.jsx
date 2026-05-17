@@ -354,8 +354,16 @@ const AdminCourseBatchesPage = () => {
                       <td>
                         <div className="action-buttons">
                           <button
-                            className="secondary-btn small-btn"
-                            onClick={() => openEditModal(batch)}
+                            className={`secondary-btn small-btn ${
+                                !batch.is_active ? "disabled-btn" : ""
+                            }`}
+                            onClick={() => batch.is_active && openEditModal(batch)}
+                            disabled={!batch.is_active}
+                            title={
+                                !batch.is_active
+                                    ? "Inactive batches cannot be edited"
+                                    : "Edit course batch"
+                            }
                           >
                             Edit
                           </button>

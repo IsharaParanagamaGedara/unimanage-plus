@@ -111,6 +111,9 @@ class AdminCourseBatchService:
         if not batch:
             return None, "Course batch not found"
 
+        if not batch.is_active:
+            return None, "Cannot modify an inactive batch"
+
         course_id = data.get("course_id", batch.course_id)
         coordinator_id = data.get("coordinator_id", batch.coordinator_id)
 
