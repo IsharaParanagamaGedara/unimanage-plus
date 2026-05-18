@@ -12,6 +12,7 @@ import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminDepartmentsPage from "./pages/admin/AdminDepartmentsPage";
 import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
 import AdminCourseBatchesPage from "./pages/admin/AdminCourseBatchesPage";
+import AdminCourseApplicationsPage from "./pages/admin/AdminCourseApplicationsPage";
 
 import AvailableBatchesPage from "./pages/student/AvailableBatchesPage";
 import MyApplicationsPage from "./pages/student/MyApplicationsPage";
@@ -78,6 +79,16 @@ function App() {
             }
           />
 
+          {/* Admin Course Application Management */}
+          <Route
+            path="/admin/course-applications"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminCourseApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Lecturer Dashboard */}
           <Route
             path="/lecturer/dashboard"
@@ -124,6 +135,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Department Staff"]}>
                 <StaffDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Department Course Applications */}
+          <Route
+            path="/staff/course-applications"
+            element={
+              <ProtectedRoute allowedRoles={["Department Staff"]}>
+                <AdminCourseApplicationsPage />
               </ProtectedRoute>
             }
           />

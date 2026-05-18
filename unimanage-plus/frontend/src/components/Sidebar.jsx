@@ -10,6 +10,7 @@ const linksByRole = {
     { label: "Departments", path: "/admin/departments", icon: "🏢" },
     { label: "Courses", path: "/admin/courses", icon: "📚" },
     { label: "Course Batches", path: "/admin/course-batches", icon: "🗓️" },
+    { label: "Applications", path: "/admin/course-applications", icon: "📝" },
     { label: "Enrollments", path: "/admin/enrollments", icon: "📝" },
     { label: "Service Requests", path: "/admin/service-requests", icon: "📩" },
     { label: "Analytics", path: "/admin/analytics", icon: "📊" },
@@ -32,6 +33,7 @@ const linksByRole = {
   ],
   "Department Staff": [
     { label: "Dashboard", path: "/staff/dashboard", icon: "🏠" },
+    { label: "Applications", path: "/staff/course-applications", icon: "📝" },
     { label: "Service Requests", path: "/staff/service-requests", icon: "📩" },
     { label: "Students", path: "/staff/students", icon: "🎓" },
     { label: "Reports", path: "/staff/reports", icon: "📄" },
