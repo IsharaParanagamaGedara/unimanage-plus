@@ -32,6 +32,9 @@ def create_app():
     from app.routes.student_course_application_routes import student_course_application_bp
     app.register_blueprint(student_course_application_bp, url_prefix="/api/student")
 
+    from app.routes.admin_course_application_routes import admin_course_application_bp
+    app.register_blueprint(admin_course_application_bp, url_prefix="/api/admin")
+
     @app.route("/api/health")
     def health_check():
         return {
