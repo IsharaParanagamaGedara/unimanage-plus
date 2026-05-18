@@ -13,6 +13,9 @@ import AdminDepartmentsPage from "./pages/admin/AdminDepartmentsPage";
 import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
 import AdminCourseBatchesPage from "./pages/admin/AdminCourseBatchesPage";
 
+import AvailableBatchesPage from "./pages/student/AvailableBatchesPage";
+import MyApplicationsPage from "./pages/student/MyApplicationsPage";
+
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
 };
@@ -91,6 +94,26 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Student"]}>
                 <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Student Available Batches*/}
+          <Route
+            path="/student/available-batches"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <AvailableBatchesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Student My Applications */}
+          <Route
+            path="/student/applications"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <MyApplicationsPage />
               </ProtectedRoute>
             }
           />

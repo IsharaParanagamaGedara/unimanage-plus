@@ -24,10 +24,11 @@ const linksByRole = {
   ],
   Student: [
     { label: "Dashboard", path: "/student/dashboard", icon: "🏠" },
-    { label: "Browse Courses", path: "/student/courses", icon: "📚" },
+    { label: "Available Batches", path: "/student/available-batches", icon: "📚" },
+    { label: "My Applications", path: "/student/applications", icon: "📝" },
     { label: "My Enrollments", path: "/student/enrollments", icon: "✅" },
     { label: "Assignments", path: "/student/assignments", icon: "📝" },
-    { label: "Service Requests", path: "/student/service-requests", icon: "📩" },
+    { label: "Service Requests", path: "/student/service-requests", icon: "📩" },,
   ],
   "Department Staff": [
     { label: "Dashboard", path: "/staff/dashboard", icon: "🏠" },
