@@ -1,0 +1,149 @@
+.student-enrollments-page {
+  width: 100%;
+}
+
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.page-header-row h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.page-header-row p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.alert {
+  padding: 13px 15px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.table-message {
+  text-align: center;
+  color: var(--muted);
+  padding: 30px;
+}
+
+.empty-card,
+.enrollment-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.empty-card {
+  text-align: center;
+}
+
+.empty-card p {
+  color: var(--muted);
+}
+
+.enrollment-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.enrollment-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.course-badge {
+  background: #eff6ff;
+  color: var(--accent);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.enrollment-card h3 {
+  margin: 0 0 8px;
+}
+
+.enrollment-card p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.enrollment-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.enrollment-info-grid div,
+.coordinator-box {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.enrollment-info-grid span,
+.coordinator-box span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.enrollment-info-grid strong,
+.coordinator-box strong {
+  font-size: 14px;
+}
+
+.coordinator-box small {
+  display: block;
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.status {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status.active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+@media (max-width: 900px) {
+  .enrollment-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .enrollment-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header-row {
+    flex-direction: column;
+  }
+}
