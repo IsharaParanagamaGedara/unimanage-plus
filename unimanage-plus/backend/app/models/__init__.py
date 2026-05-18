@@ -10,3 +10,5 @@ from app.models.course_material import CourseMaterial
 from app.models.course_batch import CourseBatch
 from app.models.course_application import CourseApplication
 from app.models.batch_enrollment import BatchEnrollment
+from app.models.service_request import ServiceRequest
+from app.models.request_status_log import RequestStatusLog
