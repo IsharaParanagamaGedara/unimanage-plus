@@ -44,6 +44,9 @@ def create_app():
     from app.routes.admin_service_request_routes import admin_service_request_bp
     app.register_blueprint(admin_service_request_bp, url_prefix="/api/admin")
 
+    from app.routes.assignment_routes import assignment_bp
+    app.register_blueprint(assignment_bp, url_prefix="/api")
+
     @app.route("/api/health")
     def health_check():
         return {
