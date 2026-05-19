@@ -19,12 +19,17 @@ def get_service_requests():
             "message": "Admin or Department Staff access required"
         }), 403
 
+    user_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
+
     search = request.args.get("search")
     status = request.args.get("status")
     request_type = request.args.get("request_type")
     priority = request.args.get("priority")
 
     result = AdminServiceRequestService.get_requests(
+        user_id=user_id,
+        role=role,
         search=search,
         status=status,
         request_type=request_type,
@@ -46,7 +51,14 @@ def get_service_request_detail(request_id):
             "message": "Admin or Department Staff access required"
         }), 403
 
-    result, error = AdminServiceRequestService.get_request_by_id(request_id)
+    user_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
+
+    result, error = AdminServiceRequestService.get_request_by_id(
+        request_id=request_id,
+        user_id=user_id,
+        role=role
+    )
 
     if error:
         return jsonify({
@@ -69,13 +81,15 @@ def update_service_request_status(request_id):
             "message": "Admin or Department Staff access required"
         }), 403
 
-    changed_by_user_id = get_jwt_identity()
+    changed_by_user_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
     data = request.get_json()
 
     result, error = AdminServiceRequestService.update_status(
         request_id=request_id,
         data=data,
-        changed_by_user_id=changed_by_user_id
+        changed_by_user_id=changed_by_user_id,
+        role=role
     )
 
     if error:

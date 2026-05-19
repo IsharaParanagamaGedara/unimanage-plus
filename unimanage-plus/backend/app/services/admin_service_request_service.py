@@ -19,8 +19,11 @@ class AdminServiceRequestService:
     ]
 
     @staticmethod
-    def get_requests(search=None, status=None, request_type=None, priority=None):
+    def get_requests(user_id, role, search=None, status=None, request_type=None, priority=None):
         query = ServiceRequest.query
+
+        if role == "Department Staff":
+            query = query.filter(ServiceRequest.assigned_to == user_id)
 
         if search:
             search_value = f"%{search}%"
@@ -49,11 +52,14 @@ class AdminServiceRequestService:
         ]
 
     @staticmethod
-    def get_request_by_id(request_id):
+    def get_request_by_id(request_id, user_id, role):
         service_request = ServiceRequest.query.get(request_id)
 
         if not service_request:
             return None, "Service request not found"
+
+        if role == "Department Staff" and service_request.assigned_to != user_id:
+            return None, "You can only view service requests assigned to you"
 
         return AdminServiceRequestService.format_request(
             service_request,
@@ -61,11 +67,14 @@ class AdminServiceRequestService:
         ), None
 
     @staticmethod
-    def update_status(request_id, data, changed_by_user_id):
+    def update_status(request_id, data, changed_by_user_id, role):
         service_request = ServiceRequest.query.get(request_id)
 
         if not service_request:
             return None, "Service request not found"
+
+        if role == "Department Staff" and service_request.assigned_to != changed_by_user_id:
+            return None, "You can only update service requests assigned to you"
 
         new_status = data.get("status", "").strip()
         note = data.get("note", "").strip()
@@ -96,6 +105,9 @@ class AdminServiceRequestService:
 
             if assigned_user.role.name not in ["Admin", "Department Staff"]:
                 return None, "Request can only be assigned to Admin or Department Staff"
+
+            if role == "Department Staff" and int(assigned_to) != changed_by_user_id:
+                return None, "Department Staff cannot reassign requests to other users"
 
             service_request.assigned_to = assigned_to
 
