@@ -25,5 +25,15 @@ class Config:
         "course_materials"
     )
 
+    ASSIGNMENT_ATTACHMENT_FOLDER = os.path.join(
+        UPLOAD_FOLDER,
+        "assignment_attachments"
+    )
+
+    ASSIGNMENT_SUBMISSION_FOLDER = os.path.join(
+        UPLOAD_FOLDER,
+        "assignment_submissions"
+    )
+
     # Maximum Upload Size = 20MB
     MAX_CONTENT_LENGTH = 20 * 1024 * 1024
