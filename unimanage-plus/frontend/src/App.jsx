@@ -13,6 +13,7 @@ import AdminDepartmentsPage from "./pages/admin/AdminDepartmentsPage";
 import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
 import AdminCourseBatchesPage from "./pages/admin/AdminCourseBatchesPage";
 import AdminCourseApplicationsPage from "./pages/admin/AdminCourseApplicationsPage";
+import AdminServiceRequestsPage from "./pages/admin/AdminServiceRequestsPage";
 
 import AvailableBatchesPage from "./pages/student/AvailableBatchesPage";
 import MyApplicationsPage from "./pages/student/MyApplicationsPage";
@@ -87,6 +88,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <AdminCourseApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Service Requests Management */}
+          <Route
+            path="/admin/service-requests"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminServiceRequestsPage />
               </ProtectedRoute>
             }
           />
@@ -167,6 +178,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Department Staff"]}>
                 <AdminCourseApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Department Service Requests */}
+          <Route
+            path="/staff/service-requests"
+            element={
+              <ProtectedRoute allowedRoles={["Department Staff"]}>
+                <AdminServiceRequestsPage />
               </ProtectedRoute>
             }
           />
