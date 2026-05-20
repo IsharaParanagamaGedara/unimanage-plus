@@ -8,30 +8,58 @@ class GradeApprovalService:
 
     @staticmethod
     def get_pending_grades(user_id, role, batch_id=None, search=None):
-        query = Grade.query.filter(Grade.status == "Pending Approval")
-
-        grades = query.order_by(Grade.graded_at.desc()).all()
+        grades = (
+            Grade.query
+            .filter(Grade.status == "Pending Approval")
+            .order_by(Grade.graded_at.desc())
+            .all()
+        )
 
         if role == "Department Staff":
             grades = [
                 grade for grade in grades
-                if grade.submission.assignment.course_batch.coordinator_id == user_id
+                if grade.submission
+                and grade.submission.assignment
+                and grade.submission.assignment.course_batch
+                and grade.submission.assignment.course_batch.coordinator_id == user_id
             ]
 
         if batch_id:
             grades = [
                 grade for grade in grades
-                if grade.submission.assignment.course_batch_id == int(batch_id)
+                if grade.submission
+                and grade.submission.assignment
+                and grade.submission.assignment.course_batch_id == int(batch_id)
             ]
 
         if search:
             search_lower = search.lower()
+
             grades = [
                 grade for grade in grades
-                if search_lower in grade.submission.assignment.title.lower()
-                or search_lower in grade.submission.student.student_number.lower()
-                or search_lower in grade.submission.student.user.first_name.lower()
-                or search_lower in grade.submission.student.user.last_name.lower()
+                if (
+                    grade.submission
+                    and grade.submission.assignment
+                    and search_lower in grade.submission.assignment.title.lower()
+                )
+                or (
+                    grade.submission
+                    and grade.submission.student
+                    and grade.submission.student.student_number
+                    and search_lower in grade.submission.student.student_number.lower()
+                )
+                or (
+                    grade.submission
+                    and grade.submission.student
+                    and grade.submission.student.user
+                    and search_lower in grade.submission.student.user.first_name.lower()
+                )
+                or (
+                    grade.submission
+                    and grade.submission.student
+                    and grade.submission.student.user
+                    and search_lower in grade.submission.student.user.last_name.lower()
+                )
             ]
 
         return [GradeApprovalService.format_grade(grade) for grade in grades]
@@ -142,6 +170,7 @@ class GradeApprovalService:
             "published_by": grade.published_by,
             "published_at": grade.published_at.isoformat() if grade.published_at else None,
             "graded_at": grade.graded_at.isoformat() if grade.graded_at else None,
+
             "submission": {
                 "id": submission.id,
                 "submission_text": submission.submission_text,
@@ -150,6 +179,7 @@ class GradeApprovalService:
                 if submission.submitted_at else None,
                 "status": submission.status,
             } if submission else None,
+
             "assignment": {
                 "id": assignment.id,
                 "title": assignment.title,
@@ -157,6 +187,7 @@ class GradeApprovalService:
                 "due_date": assignment.due_date.isoformat()
                 if assignment.due_date else None,
             } if assignment else None,
+
             "student": {
                 "id": student.id,
                 "student_number": student.student_number,
@@ -166,22 +197,26 @@ class GradeApprovalService:
                 "programme_name": student.programme_name,
                 "year_of_study": student.year_of_study,
             } if student else None,
+
             "course_batch": {
                 "id": batch.id,
                 "batch_code": batch.batch_code,
                 "batch_name": batch.batch_name,
             } if batch else None,
+
             "course": {
                 "id": course.id,
                 "course_code": course.course_code,
                 "course_name": course.course_name,
             } if course else None,
+
             "grader": {
                 "id": grade.grader.id,
                 "first_name": grade.grader.first_name,
                 "last_name": grade.grader.last_name,
                 "email": grade.grader.email,
             } if grade.grader else None,
+
             "publisher": {
                 "id": grade.publisher.id,
                 "first_name": grade.publisher.first_name,

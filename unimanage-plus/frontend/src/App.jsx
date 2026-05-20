@@ -14,6 +14,7 @@ import AdminCoursesPage from "./pages/admin/AdminCoursesPage";
 import AdminCourseBatchesPage from "./pages/admin/AdminCourseBatchesPage";
 import AdminCourseApplicationsPage from "./pages/admin/AdminCourseApplicationsPage";
 import AdminServiceRequestsPage from "./pages/admin/AdminServiceRequestsPage";
+import GradeApprovalPage from "./pages/admin/GradeApprovalPage";
 
 import AvailableBatchesPage from "./pages/student/AvailableBatchesPage";
 import MyApplicationsPage from "./pages/student/MyApplicationsPage";
@@ -122,6 +123,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <LecturerSubmissionsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Grade Approval Management */}
+          <Route
+            path="/admin/grade-approval"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <GradeApprovalPage />
               </ProtectedRoute>
             }
           />
@@ -252,6 +263,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Department Staff"]}>
                 <LecturerAssignmentsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Department Grade Approval Management */}
+          <Route
+            path="/staff/grade-approval"
+            element={
+              <ProtectedRoute allowedRoles={["Department Staff"]}>
+                <GradeApprovalPage />
               </ProtectedRoute>
             }
           />
