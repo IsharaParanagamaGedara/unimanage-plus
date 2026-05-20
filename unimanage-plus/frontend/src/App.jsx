@@ -21,6 +21,7 @@ import MyApplicationsPage from "./pages/student/MyApplicationsPage";
 import MyEnrollmentsPage from "./pages/student/MyEnrollmentsPage";
 import StudentServiceRequestsPage from "./pages/student/StudentServiceRequestsPage";
 import StudentAssignmentsPage from "./pages/student/StudentAssignmentsPage";
+import MyGradesPage from "./pages/student/MyGradesPage";
 
 import LecturerAssignmentsPage from "./pages/lecturer/LecturerAssignmentsPage";
 import LecturerSubmissionsPage from "./pages/lecturer/LecturerSubmissionsPage";
@@ -223,6 +224,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Student"]}>
                 <StudentAssignmentsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Student My Grades */}
+          <Route
+            path="/student/grades"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <MyGradesPage />
               </ProtectedRoute>
             }
           />
