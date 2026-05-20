@@ -25,6 +25,7 @@ import MyGradesPage from "./pages/student/MyGradesPage";
 
 import LecturerAssignmentsPage from "./pages/lecturer/LecturerAssignmentsPage";
 import LecturerSubmissionsPage from "./pages/lecturer/LecturerSubmissionsPage";
+import LecturerCoursesPage from "./pages/lecturer/LecturerCoursesPage";
 
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
@@ -144,6 +145,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Lecturer"]}>
                 <LecturerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Lecturer My Courses */}
+          <Route
+            path="/lecturer/courses"
+            element={
+              <ProtectedRoute allowedRoles={["Lecturer"]}>
+                <LecturerCoursesPage />
               </ProtectedRoute>
             }
           />
