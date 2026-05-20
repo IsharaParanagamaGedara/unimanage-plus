@@ -14,6 +14,7 @@ const linksByRole = {
     { label: "Enrollments", path: "/admin/enrollments", icon: "📝" },
     { label: "Service Requests", path: "/admin/service-requests", icon: "📩" },
     { label: "Assignments", path: "/admin/assignments", icon: "📝" },
+    { label: "Submissions", path: "/admin/submissions", icon: "📤" },
     { label: "Analytics", path: "/admin/analytics", icon: "📊" },
     { label: "Reports", path: "/admin/reports", icon: "📄" },
     { label: "Audit Logs", path: "/admin/audit-logs", icon: "🛡️" },

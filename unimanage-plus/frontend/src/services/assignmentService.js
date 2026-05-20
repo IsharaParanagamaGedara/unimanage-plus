@@ -11,8 +11,8 @@ export const getAssignments = async (filters = {}) => {
   return response.data.data;
 };
 
-export const getAssignmentById = async (id) => {
-  const response = await api.get(`/assignments/${id}`);
+export const getAssignmentBatches = async () => {
+  const response = await api.get("/assignments/batches");
   return response.data.data;
 };
 
@@ -20,7 +20,6 @@ export const createAssignment = async (formData) => {
   const response = await api.post("/assignments", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-
   return response.data.data;
 };
 
@@ -28,7 +27,6 @@ export const updateAssignment = async (id, formData) => {
   const response = await api.put(`/assignments/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-
   return response.data.data;
 };
 

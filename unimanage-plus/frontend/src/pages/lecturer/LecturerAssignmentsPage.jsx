@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import { useAuth } from "../../context/AuthContext";
-import { getCourseBatches } from "../../services/adminCourseBatchService";
 import {
   getAssignments,
   createAssignment,
@@ -9,6 +8,7 @@ import {
   submitAssignmentForReview,
   publishAssignment,
   updateAssignmentStatus,
+  getAssignmentBatches,
 } from "../../services/assignmentService";
 import "./LecturerAssignmentsPage.css";
 
@@ -70,8 +70,8 @@ const LecturerAssignmentsPage = () => {
 
   const loadBatches = async () => {
     try {
-      const data = await getCourseBatches({ status: "Open" });
-      setBatches(data.filter((batch) => batch.is_active));
+      const data = await getAssignmentBatches();
+      setBatches(data);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to load course batches.");
     }

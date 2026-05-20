@@ -22,6 +22,7 @@ import StudentServiceRequestsPage from "./pages/student/StudentServiceRequestsPa
 import StudentAssignmentsPage from "./pages/student/StudentAssignmentsPage";
 
 import LecturerAssignmentsPage from "./pages/lecturer/LecturerAssignmentsPage";
+import LecturerSubmissionsPage from "./pages/lecturer/LecturerSubmissionsPage";
 
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
@@ -95,7 +96,7 @@ function App() {
             }
           />
 
-          {/* Admin Service Requests Management */}
+          {/* Admin Assignments Management */}
           <Route
             path="/admin/assignments"
             element={
@@ -105,12 +106,22 @@ function App() {
             }
           />
 
-          {/* Admin Assignments Management */}
+          {/* Admin Service Requests Management */}
           <Route
             path="/admin/service-requests"
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <AdminServiceRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Assignments submissions */}
+          <Route
+            path="/admin/submissions"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <LecturerSubmissionsPage />
               </ProtectedRoute>
             }
           />
@@ -131,6 +142,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Lecturer"]}>
                 <LecturerAssignmentsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Lecturer Assignments Submissions */}
+          <Route
+            path="/lecturer/submissions"
+            element={
+              <ProtectedRoute allowedRoles={["Lecturer"]}>
+                <LecturerSubmissionsPage />
               </ProtectedRoute>
             }
           />

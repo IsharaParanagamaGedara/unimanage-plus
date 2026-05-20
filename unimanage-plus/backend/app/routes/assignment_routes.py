@@ -216,3 +216,25 @@ def update_assignment_status(assignment_id):
         "message": "Assignment status updated successfully",
         "data": result
     }), 200
+
+@assignment_bp.route("/assignments/batches", methods=["GET"])
+@jwt_required()
+def get_assignment_batches():
+    if not assignment_access_required():
+        return jsonify({
+            "success": False,
+            "message": "Assignment management access required"
+        }), 403
+
+    user_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
+
+    result = AssignmentService.get_assignment_batches(
+        user_id=user_id,
+        role=role
+    )
+
+    return jsonify({
+        "success": True,
+        "data": result
+    }), 200

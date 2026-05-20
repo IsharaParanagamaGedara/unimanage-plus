@@ -22,7 +22,12 @@ class AssignmentService:
         query = Assignment.query.join(CourseBatch)
 
         if role == "Lecturer":
-            query = query.filter(Assignment.created_by == user_id)
+            query = query.filter(
+                db.or_(
+                    Assignment.created_by == user_id,
+                    CourseBatch.course.has(lecturer_id=user_id)
+                )
+            )
 
         elif role == "Department Staff":
             query = query.filter(CourseBatch.coordinator_id == user_id)
@@ -429,3 +434,38 @@ class AssignmentService:
             description=description
         )
         db.session.add(log)
+
+    @staticmethod
+    def get_assignment_batches(user_id, role):
+        query = CourseBatch.query.filter(
+            CourseBatch.is_active == True,
+            CourseBatch.status == "Open"
+        )
+
+        if role == "Lecturer":
+            query = query.filter(
+                CourseBatch.course.has(lecturer_id=user_id)
+            )
+
+        elif role == "Department Staff":
+            query = query.filter(CourseBatch.coordinator_id == user_id)
+
+        elif role != "Admin":
+            return []
+
+        batches = query.order_by(CourseBatch.batch_code.asc()).all()
+
+        return [
+            {
+                "id": batch.id,
+                "batch_code": batch.batch_code,
+                "batch_name": batch.batch_name,
+                "course": {
+                    "id": batch.course.id,
+                    "course_code": batch.course.course_code,
+                    "course_name": batch.course.course_name,
+                    "lecturer_id": batch.course.lecturer_id
+                } if batch.course else None
+            }
+            for batch in batches
+        ]
