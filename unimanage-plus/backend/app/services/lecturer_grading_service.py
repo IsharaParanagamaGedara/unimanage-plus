@@ -2,6 +2,8 @@ from datetime import datetime
 from app.extensions import db
 from app.models.assignment_submission import AssignmentSubmission
 from app.models.assignment import Assignment
+from app.models.course_batch import CourseBatch
+from app.models.course import Course
 from app.models.grade import Grade
 from app.models.audit_log import AuditLog
 
@@ -10,10 +12,15 @@ class LecturerGradingService:
 
     @staticmethod
     def get_submissions(user_id, role, assignment_id=None, batch_id=None, search=None):
-        query = AssignmentSubmission.query.join(Assignment)
+        query = (
+            AssignmentSubmission.query
+            .join(Assignment, AssignmentSubmission.assignment_id == Assignment.id)
+            .join(CourseBatch, Assignment.course_batch_id == CourseBatch.id)
+            .join(Course, CourseBatch.course_id == Course.id)
+        )
 
         if role == "Lecturer":
-            query = query.filter(Assignment.created_by == user_id)
+            query = query.filter(Course.lecturer_id == user_id)
 
         if assignment_id:
             query = query.filter(AssignmentSubmission.assignment_id == assignment_id)
@@ -26,7 +33,11 @@ class LecturerGradingService:
             query = query.filter(
                 db.or_(
                     Assignment.title.ilike(search_value),
-                    AssignmentSubmission.submission_text.ilike(search_value)
+                    AssignmentSubmission.submission_text.ilike(search_value),
+                    Course.course_code.ilike(search_value),
+                    Course.course_name.ilike(search_value),
+                    CourseBatch.batch_code.ilike(search_value),
+                    CourseBatch.batch_name.ilike(search_value)
                 )
             )
 
@@ -198,8 +209,12 @@ class LecturerGradingService:
             return None
 
         if role == "Lecturer":
-            if assignment.created_by != user_id:
-                return "Lecturer can access only submissions for their own assignments"
+            batch = assignment.course_batch if assignment else None
+            course = batch.course if batch else None
+
+            if not course or course.lecturer_id != user_id:
+                return "Lecturer can access only submissions for assigned courses"
+
             return None
 
         return "Lecturer or Admin access required"
