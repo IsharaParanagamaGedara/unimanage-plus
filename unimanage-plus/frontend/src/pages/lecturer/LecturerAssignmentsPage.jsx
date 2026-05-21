@@ -9,6 +9,7 @@ import {
   publishAssignment,
   updateAssignmentStatus,
   getAssignmentBatches,
+  downloadAssignmentAttachment,
 } from "../../services/assignmentService";
 import "./LecturerAssignmentsPage.css";
 
@@ -105,6 +106,19 @@ const LecturerAssignmentsPage = () => {
       ...prev,
       [name]: files ? files[0] : value,
     }));
+  };
+
+  const handleDownloadAttachment = async (assignment) => {
+    try {
+      setError("");
+
+      await downloadAssignmentAttachment(
+        assignment.id,
+        assignment.attachment_name
+      );
+    } catch (err) {
+      setError("Failed to download assignment attachment.");
+    }
   };
 
   const openCreateModal = () => {
@@ -365,9 +379,18 @@ const LecturerAssignmentsPage = () => {
                     <tr key={assignment.id}>
                       <td>
                         <strong>{assignment.title}</strong>
-                        <span className="sub-text">{assignment.description || "No description"}</span>
+                        <span className="sub-text">
+                          {assignment.description || "No description"}
+                        </span>
+
                         {assignment.attachment_name && (
-                          <span className="file-pill">{assignment.attachment_name}</span>
+                          <button
+                            type="button"
+                            className="file-download-btn"
+                            onClick={() => handleDownloadAttachment(assignment)}
+                          >
+                            Download: {assignment.attachment_name}
+                          </button>
                         )}
                       </td>
 

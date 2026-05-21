@@ -315,6 +315,23 @@
   margin-top: 22px;
 }
 
+.file-download-btn {
+  display: inline-block;
+  margin-top: 8px;
+  background: #eff6ff;
+  color: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.file-download-btn:hover {
+  background: #dbeafe;
+}
+
 @media (max-width: 1100px) {
   .assignment-summary-grid {
     grid-template-columns: repeat(2, 1fr);

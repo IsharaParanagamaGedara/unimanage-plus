@@ -6,6 +6,7 @@ import {
   createDraftGrade,
   updateDraftGrade,
   submitGradeForApproval,
+  downloadSubmissionFile,
 } from "../../services/lecturerGradingService";
 import "./LecturerSubmissionsPage.css";
 
@@ -62,6 +63,19 @@ const LecturerSubmissionsPage = () => {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleDownloadSubmission = async (submission) => {
+    try {
+      setError("");
+
+      await downloadSubmissionFile(
+        submission.id,
+        submission.file_name
+      );
+    } catch (err) {
+      setError("Failed to download submission file.");
+    }
   };
 
   const openDetailModal = async (submissionId) => {
@@ -350,6 +364,15 @@ const LecturerSubmissionsPage = () => {
                             View
                           </button>
 
+                          {submission.file_name && (
+                            <button
+                              className="secondary-btn small-btn"
+                              onClick={() => handleDownloadSubmission(submission)}
+                            >
+                              Download
+                            </button>
+                          )}
+
                           {(!submission.grade || submission.grade.status === "Draft") && (
                             <button
                               className="primary-btn small-btn"
@@ -419,7 +442,18 @@ const LecturerSubmissionsPage = () => {
 
                     <div>
                       <span>File</span>
-                      <strong>{selectedSubmission.file_name || "No file uploaded"}</strong>
+
+                      {selectedSubmission.file_name ? (
+                        <button
+                          type="button"
+                          className="file-download-btn"
+                          onClick={() => handleDownloadSubmission(selectedSubmission)}
+                        >
+                          Download: {selectedSubmission.file_name}
+                        </button>
+                      ) : (
+                        <strong>No file uploaded</strong>
+                      )}
                     </div>
                   </div>
 

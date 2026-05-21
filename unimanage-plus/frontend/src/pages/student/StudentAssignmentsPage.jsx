@@ -5,6 +5,7 @@ import {
   getStudentAssignmentById,
   submitStudentAssignment,
   getMySubmissions,
+  downloadMySubmissionFile,
 } from "../../services/studentAssignmentService";
 import "./StudentAssignmentsPage.css";
 
@@ -59,6 +60,19 @@ const StudentAssignmentsPage = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     loadAssignments();
+  };
+
+  const handleDownloadSubmission = async (submission) => {
+    try {
+      setError("");
+
+      await downloadMySubmissionFile(
+        submission.id,
+        submission.file_name
+      );
+    } catch (err) {
+      setError("Failed to download submitted file.");
+    }
   };
 
   const openSubmitModal = async (assignmentId) => {
@@ -283,7 +297,16 @@ const StudentAssignmentsPage = () => {
                           ? new Date(submission.submitted_at).toLocaleString()
                           : "-"}
                       </strong>
-                      {submission.file_name && <small>{submission.file_name}</small>}
+
+                      {submission.file_name && (
+                        <button
+                          type="button"
+                          className="file-download-btn"
+                          onClick={() => handleDownloadSubmission(submission)}
+                        >
+                          Download: {submission.file_name}
+                        </button>
+                      )}
                     </div>
                   )}
 
