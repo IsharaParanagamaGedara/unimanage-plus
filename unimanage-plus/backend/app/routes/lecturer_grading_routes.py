@@ -1,6 +1,9 @@
-from flask import Blueprint, request, jsonify
+import os
+from flask import Blueprint, request, jsonify, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+
 from app.services.lecturer_grading_service import LecturerGradingService
+from app.models.assignment_submission import AssignmentSubmission
 
 lecturer_grading_bp = Blueprint("lecturer_grading", __name__)
 
@@ -19,25 +22,15 @@ def get_submissions():
             "message": "Lecturer or Admin access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
-    assignment_id = request.args.get("assignment_id")
-    batch_id = request.args.get("batch_id")
-    search = request.args.get("search")
-
     result = LecturerGradingService.get_submissions(
-        user_id=user_id,
-        role=role,
-        assignment_id=assignment_id,
-        batch_id=batch_id,
-        search=search
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role"),
+        assignment_id=request.args.get("assignment_id"),
+        batch_id=request.args.get("batch_id"),
+        search=request.args.get("search")
     )
 
-    return jsonify({
-        "success": True,
-        "data": result
-    }), 200
+    return jsonify({"success": True, "data": result}), 200
 
 
 @lecturer_grading_bp.route("/lecturer/submissions/<int:submission_id>", methods=["GET"])
@@ -49,25 +42,55 @@ def get_submission_detail(submission_id):
             "message": "Lecturer or Admin access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
     result, error = LecturerGradingService.get_submission_by_id(
         submission_id=submission_id,
-        user_id=user_id,
-        role=role
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role")
     )
 
     if error:
+        return jsonify({"success": False, "message": error}), 404
+
+    return jsonify({"success": True, "data": result}), 200
+
+
+@lecturer_grading_bp.route("/lecturer/submissions/<int:submission_id>/download", methods=["GET"])
+@jwt_required()
+def download_submission_file(submission_id):
+    if not lecturer_or_admin_required():
         return jsonify({
             "success": False,
-            "message": error
+            "message": "Lecturer or Admin access required"
+        }), 403
+
+    _, error = LecturerGradingService.get_submission_by_id(
+        submission_id=submission_id,
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role")
+    )
+
+    if error:
+        return jsonify({"success": False, "message": error}), 403
+
+    submission = AssignmentSubmission.query.get(submission_id)
+
+    if not submission or not submission.file_path:
+        return jsonify({
+            "success": False,
+            "message": "No file found for this submission"
         }), 404
 
-    return jsonify({
-        "success": True,
-        "data": result
-    }), 200
+    if not os.path.exists(submission.file_path):
+        return jsonify({
+            "success": False,
+            "message": "Submission file not found on server"
+        }), 404
+
+    return send_file(
+        submission.file_path,
+        as_attachment=True,
+        download_name=submission.file_name
+    )
 
 
 @lecturer_grading_bp.route("/lecturer/submissions/<int:submission_id>/grade", methods=["POST"])
@@ -79,22 +102,15 @@ def create_grade(submission_id):
             "message": "Lecturer or Admin access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-    data = request.get_json()
-
     result, error = LecturerGradingService.create_grade(
         submission_id=submission_id,
-        user_id=user_id,
-        role=role,
-        data=data
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role"),
+        data=request.get_json()
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,
@@ -112,22 +128,15 @@ def update_grade(grade_id):
             "message": "Lecturer or Admin access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-    data = request.get_json()
-
     result, error = LecturerGradingService.update_grade(
         grade_id=grade_id,
-        user_id=user_id,
-        role=role,
-        data=data
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role"),
+        data=request.get_json()
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,
@@ -145,20 +154,14 @@ def submit_grade_for_approval(grade_id):
             "message": "Lecturer or Admin access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
     result, error = LecturerGradingService.submit_grade_for_approval(
         grade_id=grade_id,
-        user_id=user_id,
-        role=role
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role")
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,

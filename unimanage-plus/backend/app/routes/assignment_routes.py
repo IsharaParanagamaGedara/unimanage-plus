@@ -1,6 +1,9 @@
-from flask import Blueprint, request, jsonify
+import os
+from flask import Blueprint, request, jsonify, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+
 from app.services.assignment_service import AssignmentService
+from app.models.assignment import Assignment
 
 assignment_bp = Blueprint("assignment", __name__)
 
@@ -22,22 +25,15 @@ def get_assignments():
     user_id = int(get_jwt_identity())
     role = get_jwt().get("role")
 
-    status = request.args.get("status")
-    batch_id = request.args.get("batch_id")
-    search = request.args.get("search")
-
     result = AssignmentService.get_assignments(
         user_id=user_id,
         role=role,
-        status=status,
-        batch_id=batch_id,
-        search=search
+        status=request.args.get("status"),
+        batch_id=request.args.get("batch_id"),
+        search=request.args.get("search")
     )
 
-    return jsonify({
-        "success": True,
-        "data": result
-    }), 200
+    return jsonify({"success": True, "data": result}), 200
 
 
 @assignment_bp.route("/assignments", methods=["POST"])
@@ -49,23 +45,15 @@ def create_assignment():
             "message": "Assignment management access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
-    file = request.files.get("attachment")
-
     result, error = AssignmentService.create_assignment(
-        user_id=user_id,
-        role=role,
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role"),
         form_data=request.form,
-        file=file
+        file=request.files.get("attachment")
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,
@@ -83,25 +71,16 @@ def get_assignment_detail(assignment_id):
             "message": "Assignment management access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
     result, error = AssignmentService.get_assignment_by_id(
         assignment_id=assignment_id,
-        user_id=user_id,
-        role=role
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role")
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 404
+        return jsonify({"success": False, "message": error}), 404
 
-    return jsonify({
-        "success": True,
-        "data": result
-    }), 200
+    return jsonify({"success": True, "data": result}), 200
 
 
 @assignment_bp.route("/assignments/<int:assignment_id>", methods=["PUT"])
@@ -113,24 +92,16 @@ def update_assignment(assignment_id):
             "message": "Assignment management access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
-    file = request.files.get("attachment")
-
     result, error = AssignmentService.update_assignment(
         assignment_id=assignment_id,
-        user_id=user_id,
-        role=role,
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role"),
         form_data=request.form,
-        file=file
+        file=request.files.get("attachment")
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,
@@ -142,20 +113,14 @@ def update_assignment(assignment_id):
 @assignment_bp.route("/assignments/<int:assignment_id>/submit-review", methods=["PATCH"])
 @jwt_required()
 def submit_assignment_for_review(assignment_id):
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
     result, error = AssignmentService.submit_for_review(
         assignment_id=assignment_id,
-        user_id=user_id,
-        role=role
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role")
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,
@@ -167,22 +132,15 @@ def submit_assignment_for_review(assignment_id):
 @assignment_bp.route("/assignments/<int:assignment_id>/publish", methods=["PATCH"])
 @jwt_required()
 def publish_assignment(assignment_id):
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-    data = request.get_json() or {}
-
     result, error = AssignmentService.publish_assignment(
         assignment_id=assignment_id,
-        user_id=user_id,
-        role=role,
-        data=data
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role"),
+        data=request.get_json() or {}
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,
@@ -194,28 +152,64 @@ def publish_assignment(assignment_id):
 @assignment_bp.route("/assignments/<int:assignment_id>/status", methods=["PATCH"])
 @jwt_required()
 def update_assignment_status(assignment_id):
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-    data = request.get_json() or {}
-
     result, error = AssignmentService.update_assignment_status(
         assignment_id=assignment_id,
-        user_id=user_id,
-        role=role,
-        data=data
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role"),
+        data=request.get_json() or {}
     )
 
     if error:
-        return jsonify({
-            "success": False,
-            "message": error
-        }), 400
+        return jsonify({"success": False, "message": error}), 400
 
     return jsonify({
         "success": True,
         "message": "Assignment status updated successfully",
         "data": result
     }), 200
+
+
+@assignment_bp.route("/assignments/<int:assignment_id>/download", methods=["GET"])
+@jwt_required()
+def download_assignment_attachment(assignment_id):
+    if not assignment_access_required():
+        return jsonify({
+            "success": False,
+            "message": "Assignment access required"
+        }), 403
+
+    user_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
+
+    _, error = AssignmentService.get_assignment_by_id(
+        assignment_id=assignment_id,
+        user_id=user_id,
+        role=role
+    )
+
+    if error:
+        return jsonify({"success": False, "message": error}), 403
+
+    assignment = Assignment.query.get(assignment_id)
+
+    if not assignment or not assignment.attachment_path:
+        return jsonify({
+            "success": False,
+            "message": "No attachment found for this assignment"
+        }), 404
+
+    if not os.path.exists(assignment.attachment_path):
+        return jsonify({
+            "success": False,
+            "message": "Attachment file not found on server"
+        }), 404
+
+    return send_file(
+        assignment.attachment_path,
+        as_attachment=True,
+        download_name=assignment.attachment_name
+    )
+
 
 @assignment_bp.route("/assignments/batches", methods=["GET"])
 @jwt_required()
@@ -226,15 +220,9 @@ def get_assignment_batches():
             "message": "Assignment management access required"
         }), 403
 
-    user_id = int(get_jwt_identity())
-    role = get_jwt().get("role")
-
     result = AssignmentService.get_assignment_batches(
-        user_id=user_id,
-        role=role
+        user_id=int(get_jwt_identity()),
+        role=get_jwt().get("role")
     )
 
-    return jsonify({
-        "success": True,
-        "data": result
-    }), 200
+    return jsonify({"success": True, "data": result}), 200
