@@ -15,3 +15,4 @@ from app.models.request_status_log import RequestStatusLog
 from app.models.assignment import Assignment
 from app.models.assignment_submission import AssignmentSubmission
 from app.models.grade import Grade
+from app.models.notification import Notification
