@@ -53,6 +53,46 @@ def get_assignment_detail(assignment_id):
     return jsonify({"success": True, "data": result}), 200
 
 
+@student_assignment_bp.route("/assignments/<int:assignment_id>/download", methods=["GET"])
+@jwt_required()
+def download_assignment_attachment(assignment_id):
+    if not student_required():
+        return jsonify({
+            "success": False,
+            "message": "Student access required"
+        }), 403
+
+    assignment, error = StudentAssignmentService.get_assignment_for_download(
+        user_id=int(get_jwt_identity()),
+        assignment_id=assignment_id
+    )
+
+    if error:
+        status_code = 404 if "not found" in error.lower() else 403
+        return jsonify({
+            "success": False,
+            "message": error
+        }), status_code
+
+    if not assignment.attachment_path:
+        return jsonify({
+            "success": False,
+            "message": "No attachment found for this assignment"
+        }), 404
+
+    if not os.path.exists(assignment.attachment_path):
+        return jsonify({
+            "success": False,
+            "message": "Assignment attachment file not found on server"
+        }), 404
+
+    return send_file(
+        assignment.attachment_path,
+        as_attachment=True,
+        download_name=assignment.attachment_name
+    )
+
+
 @student_assignment_bp.route("/assignments/<int:assignment_id>/submit", methods=["POST"])
 @jwt_required()
 def submit_assignment(assignment_id):

@@ -31,6 +31,26 @@ export const getMySubmissions = async () => {
   return response.data.data;
 };
 
+export const downloadStudentAssignmentAttachment = async (
+  assignmentId,
+  fileName
+) => {
+  const response = await api.get(`/student/assignments/${assignmentId}/download`, {
+    responseType: "blob",
+  });
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.setAttribute("download", fileName || "assignment-attachment");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.URL.revokeObjectURL(url);
+};
+
 export const downloadMySubmissionFile = async (submissionId, fileName) => {
   const response = await api.get(`/student/submissions/${submissionId}/download`, {
     responseType: "blob",

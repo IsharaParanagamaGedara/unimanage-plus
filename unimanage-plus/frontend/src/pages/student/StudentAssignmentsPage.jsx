@@ -6,6 +6,7 @@ import {
   submitStudentAssignment,
   getMySubmissions,
   downloadMySubmissionFile,
+  downloadStudentAssignmentAttachment,
 } from "../../services/studentAssignmentService";
 import "./StudentAssignmentsPage.css";
 
@@ -62,14 +63,24 @@ const StudentAssignmentsPage = () => {
     loadAssignments();
   };
 
+  const handleDownloadAssignmentAttachment = async (assignment) => {
+    try {
+      setError("");
+
+      await downloadStudentAssignmentAttachment(
+        assignment.id,
+        assignment.attachment_name
+      );
+    } catch (err) {
+      setError("Failed to download assignment attachment.");
+    }
+  };
+
   const handleDownloadSubmission = async (submission) => {
     try {
       setError("");
 
-      await downloadMySubmissionFile(
-        submission.id,
-        submission.file_name
-      );
+      await downloadMySubmissionFile(submission.id, submission.file_name);
     } catch (err) {
       setError("Failed to download submitted file.");
     }
@@ -283,8 +294,16 @@ const StudentAssignmentsPage = () => {
 
                   {assignment.attachment_name && (
                     <div className="attachment-box">
-                      <span>Attachment</span>
-                      <strong>{assignment.attachment_name}</strong>
+                      <span>Assignment Attachment</span>
+
+                      <button
+                        type="button"
+                        className="file-download-btn"
+                        onClick={() => handleDownloadAssignmentAttachment(assignment)}
+                      >
+                        Download: {assignment.attachment_name}
+                      </button>
+
                       <small>{assignment.attachment_size_mb} MB</small>
                     </div>
                   )}
@@ -366,6 +385,22 @@ const StudentAssignmentsPage = () => {
                       <span>Max Marks</span>
                       <strong>{selectedAssignment.max_marks}</strong>
                     </div>
+
+                    {selectedAssignment.attachment_name && (
+                      <div className="detail-row">
+                        <span>Attachment</span>
+
+                        <button
+                          type="button"
+                          className="file-download-btn"
+                          onClick={() =>
+                            handleDownloadAssignmentAttachment(selectedAssignment)
+                          }
+                        >
+                          Download: {selectedAssignment.attachment_name}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-group">

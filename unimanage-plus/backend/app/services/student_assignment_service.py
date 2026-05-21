@@ -100,6 +100,32 @@ class StudentAssignmentService:
         ), None
 
     @staticmethod
+    def get_assignment_for_download(user_id, assignment_id):
+        student, error = StudentAssignmentService.get_student_profile(user_id)
+
+        if error:
+            return None, error
+
+        assignment = Assignment.query.get(assignment_id)
+
+        if not assignment:
+            return None, "Assignment not found"
+
+        if assignment.status != "Published" or not assignment.is_active:
+            return None, "Assignment is not available"
+
+        enrolled = BatchEnrollment.query.filter_by(
+            student_id=student.id,
+            batch_id=assignment.course_batch_id,
+            enrollment_status="Active"
+        ).first()
+
+        if not enrolled:
+            return None, "You can download attachments only for your enrolled batch assignments"
+
+        return assignment, None
+
+    @staticmethod
     def submit_assignment(user_id, assignment_id, form_data, file=None):
         student, error = StudentAssignmentService.get_student_profile(user_id)
 
@@ -297,6 +323,11 @@ class StudentAssignmentService:
                 "due_date": assignment.due_date.isoformat()
                 if assignment.due_date else None,
                 "max_marks": assignment.max_marks,
+                "attachment_name": assignment.attachment_name,
+                "attachment_type": assignment.attachment_type,
+                "attachment_size": assignment.attachment_size,
+                "attachment_size_mb": round(assignment.attachment_size / (1024 * 1024), 2)
+                if assignment.attachment_size else None,
                 "course_batch": {
                     "id": batch.id,
                     "batch_code": batch.batch_code,
