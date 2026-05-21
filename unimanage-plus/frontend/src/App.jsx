@@ -27,6 +27,8 @@ import LecturerAssignmentsPage from "./pages/lecturer/LecturerAssignmentsPage";
 import LecturerSubmissionsPage from "./pages/lecturer/LecturerSubmissionsPage";
 import LecturerCoursesPage from "./pages/lecturer/LecturerCoursesPage";
 
+import CourseMaterialsPage from "./pages/common/CourseMaterialsPage";
+
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
 };
@@ -159,6 +161,16 @@ function App() {
             }
           />
 
+          {/* Lecturer My Course Materials */}
+          <Route
+            path="/lecturer/materials"
+            element={
+              <ProtectedRoute allowedRoles={["Lecturer"]}>
+                <CourseMaterialsPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Lecturer Assignments Management */}
           <Route
             path="/lecturer/assignments"
@@ -219,6 +231,16 @@ function App() {
             }
           />
 
+          {/* Student My Course Materials */}
+          <Route
+            path="/student/materials"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <CourseMaterialsPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Student Service Requests */}
           <Route
             path="/student/service-requests"
@@ -275,6 +297,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Department Staff"]}>
                 <AdminServiceRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Department Course Materials */}
+          <Route
+            path="/staff/materials"
+            element={
+              <ProtectedRoute allowedRoles={["Department Staff"]}>
+                <CourseMaterialsPage />
               </ProtectedRoute>
             }
           />

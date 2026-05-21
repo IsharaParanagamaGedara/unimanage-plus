@@ -1,12 +1,12 @@
 import api from "./api";
 
 export const getCourseMaterials = async (courseId) => {
-  const response = await api.get(`/admin/courses/${courseId}/materials`);
+  const response = await api.get(`/courses/${courseId}/materials`);
   return response.data.data;
 };
 
 export const uploadCourseMaterial = async (courseId, formData) => {
-  const response = await api.post(`/admin/courses/${courseId}/materials`, formData, {
+  const response = await api.post(`/courses/${courseId}/materials`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -16,12 +16,12 @@ export const uploadCourseMaterial = async (courseId, formData) => {
 };
 
 export const updateCourseMaterial = async (materialId, data) => {
-  const response = await api.put(`/admin/course-materials/${materialId}`, data);
+  const response = await api.put(`/course-materials/${materialId}`, data);
   return response.data.data;
 };
 
 export const updateCourseMaterialStatus = async (materialId, isActive) => {
-  const response = await api.patch(`/admin/course-materials/${materialId}/status`, {
+  const response = await api.patch(`/course-materials/${materialId}/status`, {
     is_active: isActive,
   });
 
@@ -29,7 +29,7 @@ export const updateCourseMaterialStatus = async (materialId, isActive) => {
 };
 
 export const downloadCourseMaterial = async (materialId, fileName) => {
-  const response = await api.get(`/admin/course-materials/${materialId}/download`, {
+  const response = await api.get(`/course-materials/${materialId}/download`, {
     responseType: "blob",
   });
 
@@ -37,7 +37,7 @@ export const downloadCourseMaterial = async (materialId, fileName) => {
   const link = document.createElement("a");
 
   link.href = url;
-  link.setAttribute("download", fileName);
+  link.setAttribute("download", fileName || "course-material");
   document.body.appendChild(link);
   link.click();
   link.remove();

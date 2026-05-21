@@ -1,21 +1,31 @@
 from flask import Blueprint, request, jsonify, send_file
-from flask_jwt_extended import get_jwt_identity
-from app.utils.decorators import admin_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services.course_material_service import CourseMaterialService
 
 course_material_bp = Blueprint("course_material", __name__)
 
 
+def get_current_user_context():
+    return int(get_jwt_identity()), get_jwt().get("role")
+
+
+@course_material_bp.route("/admin/courses/<int:course_id>/materials", methods=["GET"])
 @course_material_bp.route("/courses/<int:course_id>/materials", methods=["GET"])
-@admin_required
+@jwt_required()
 def get_course_materials(course_id):
-    result, error = CourseMaterialService.get_materials_by_course(course_id)
+    user_id, role = get_current_user_context()
+
+    result, error = CourseMaterialService.get_materials_by_course(
+        course_id=course_id,
+        user_id=user_id,
+        role=role
+    )
 
     if error:
         return jsonify({
             "success": False,
             "message": error
-        }), 404
+        }), 403
 
     return jsonify({
         "success": True,
@@ -23,18 +33,19 @@ def get_course_materials(course_id):
     }), 200
 
 
+@course_material_bp.route("/admin/courses/<int:course_id>/materials", methods=["POST"])
 @course_material_bp.route("/courses/<int:course_id>/materials", methods=["POST"])
-@admin_required
+@jwt_required()
 def upload_course_material(course_id):
-    uploaded_by_user_id = get_jwt_identity()
-
+    user_id, role = get_current_user_context()
     file = request.files.get("file")
 
     result, error = CourseMaterialService.upload_material(
         course_id=course_id,
         form_data=request.form,
         file=file,
-        uploaded_by_user_id=uploaded_by_user_id
+        uploaded_by_user_id=user_id,
+        role=role
     )
 
     if error:
@@ -50,16 +61,18 @@ def upload_course_material(course_id):
     }), 201
 
 
+@course_material_bp.route("/admin/course-materials/<int:material_id>", methods=["PUT"])
 @course_material_bp.route("/course-materials/<int:material_id>", methods=["PUT"])
-@admin_required
+@jwt_required()
 def update_course_material(material_id):
+    user_id, role = get_current_user_context()
     data = request.get_json()
-    updated_by_user_id = get_jwt_identity()
 
     result, error = CourseMaterialService.update_material(
         material_id=material_id,
         data=data,
-        updated_by_user_id=updated_by_user_id
+        updated_by_user_id=user_id,
+        role=role
     )
 
     if error:
@@ -75,11 +88,12 @@ def update_course_material(material_id):
     }), 200
 
 
+@course_material_bp.route("/admin/course-materials/<int:material_id>/status", methods=["PATCH"])
 @course_material_bp.route("/course-materials/<int:material_id>/status", methods=["PATCH"])
-@admin_required
+@jwt_required()
 def update_course_material_status(material_id):
+    user_id, role = get_current_user_context()
     data = request.get_json()
-    updated_by_user_id = get_jwt_identity()
 
     if "is_active" not in data:
         return jsonify({
@@ -90,14 +104,15 @@ def update_course_material_status(material_id):
     result, error = CourseMaterialService.update_material_status(
         material_id=material_id,
         is_active=data.get("is_active"),
-        updated_by_user_id=updated_by_user_id
+        updated_by_user_id=user_id,
+        role=role
     )
 
     if error:
         return jsonify({
             "success": False,
             "message": error
-        }), 404
+        }), 400
 
     return jsonify({
         "success": True,
@@ -106,10 +121,17 @@ def update_course_material_status(material_id):
     }), 200
 
 
+@course_material_bp.route("/admin/course-materials/<int:material_id>/download", methods=["GET"])
 @course_material_bp.route("/course-materials/<int:material_id>/download", methods=["GET"])
-@admin_required
+@jwt_required()
 def download_course_material(material_id):
-    material, error = CourseMaterialService.get_material_for_download(material_id)
+    user_id, role = get_current_user_context()
+
+    material, error = CourseMaterialService.get_material_for_download(
+        material_id=material_id,
+        user_id=user_id,
+        role=role
+    )
 
     if error:
         return jsonify({

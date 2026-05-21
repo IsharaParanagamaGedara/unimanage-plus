@@ -24,7 +24,7 @@ def create_app():
     app.register_blueprint(admin_course_bp, url_prefix="/api/admin")
 
     from app.routes.course_material_routes import course_material_bp
-    app.register_blueprint(course_material_bp, url_prefix="/api/admin")
+    app.register_blueprint(course_material_bp, url_prefix="/api")
 
     from app.routes.admin_course_batch_routes import admin_course_batch_bp
     app.register_blueprint(admin_course_batch_bp, url_prefix="/api/admin")

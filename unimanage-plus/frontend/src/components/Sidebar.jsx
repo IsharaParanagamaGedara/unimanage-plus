@@ -23,6 +23,7 @@ const linksByRole = {
   Lecturer: [
     { label: "Dashboard", path: "/lecturer/dashboard", icon: "🏠" },
     { label: "My Courses", path: "/lecturer/courses", icon: "📚" },
+    { label: "Course Materials", path: "/lecturer/materials", icon: "📁" },
     { label: "Assignments", path: "/lecturer/assignments", icon: "📝" },
     { label: "Submissions", path: "/lecturer/submissions", icon: "📤" },
   ],
@@ -31,6 +32,7 @@ const linksByRole = {
     { label: "Available Batches", path: "/student/available-batches", icon: "📚" },
     { label: "My Applications", path: "/student/applications", icon: "📝" },
     { label: "My Enrollments", path: "/student/enrollments", icon: "✅" },
+    { label: "Course Materials", path: "/student/materials", icon: "📁" },
     { label: "Assignments", path: "/student/assignments", icon: "📝" },
     { label: "My Grades", path: "/student/grades", icon: "🎯" },
     { label: "Service Requests", path: "/student/service-requests", icon: "📩" },,
@@ -38,6 +40,7 @@ const linksByRole = {
   "Department Staff": [
     { label: "Dashboard", path: "/staff/dashboard", icon: "🏠" },
     { label: "Applications", path: "/staff/course-applications", icon: "📝" },
+    { label: "Course Materials", path: "/staff/materials", icon: "📁" },
     { label: "Service Requests", path: "/staff/service-requests", icon: "📩" },
     { label: "Assignments Review", path: "/staff/assignments", icon: "📝" },
     { label: "Grade Approval", path: "/staff/grade-approval", icon: "✅" },
