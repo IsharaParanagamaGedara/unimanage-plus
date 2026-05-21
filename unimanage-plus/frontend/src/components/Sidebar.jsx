@@ -11,7 +11,6 @@ const linksByRole = {
     { label: "Courses", path: "/admin/courses", icon: "📚" },
     { label: "Course Batches", path: "/admin/course-batches", icon: "🗓️" },
     { label: "Applications", path: "/admin/course-applications", icon: "📝" },
-    { label: "Enrollments", path: "/admin/enrollments", icon: "📝" },
     { label: "Service Requests", path: "/admin/service-requests", icon: "📩" },
     { label: "Assignments", path: "/admin/assignments", icon: "📝" },
     { label: "Submissions", path: "/admin/submissions", icon: "📤" },
