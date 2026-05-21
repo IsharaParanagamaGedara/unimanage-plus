@@ -2,6 +2,7 @@ from datetime import datetime
 from app.extensions import db
 from app.models.grade import Grade
 from app.models.audit_log import AuditLog
+from app.services.notification_service import NotificationService
 
 
 class GradeApprovalService:
@@ -88,6 +89,14 @@ class GradeApprovalService:
 
         grade.submission.status = "Grade Published"
 
+        if grade.submission and grade.submission.student and grade.submission.student.user_id:
+            NotificationService.create_notification(
+                user_id=grade.submission.student.user_id,
+                title="Grade Published",
+                message=f"Your grade for '{grade.submission.assignment.title}' has been published.",
+                notification_type="Grade"
+            )
+
         GradeApprovalService.create_audit_log(
             user_id,
             "PUBLISH_GRADE",
@@ -124,6 +133,14 @@ class GradeApprovalService:
         grade.published_at = None
 
         grade.submission.status = "Graded Draft"
+
+        if grade.graded_by:
+            NotificationService.create_notification(
+                user_id=grade.graded_by,
+                title="Grade Returned for Revision",
+                message=f"The grade for '{grade.submission.assignment.title}' was returned to Draft. Note: {approval_note}",
+                notification_type="Grade"
+            )
 
         GradeApprovalService.create_audit_log(
             user_id,

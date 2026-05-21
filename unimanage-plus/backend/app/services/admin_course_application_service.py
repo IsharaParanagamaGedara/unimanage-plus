@@ -5,6 +5,7 @@ from app.models.batch_enrollment import BatchEnrollment
 from app.models.course_batch import CourseBatch
 from app.models.audit_log import AuditLog
 from app.models.user import User
+from app.services.notification_service import NotificationService
 
 
 class AdminCourseApplicationService:
@@ -89,6 +90,14 @@ class AdminCourseApplicationService:
         application.review_note = review_note
         application.reviewed_by = reviewed_by_user_id
         application.reviewed_at = datetime.utcnow()
+
+        if application.student and application.student.user_id:
+            NotificationService.create_notification(
+                user_id=application.student.user_id,
+                title=f"Course Application {decision}",
+                message=f"Your application for {batch.batch_code} - {batch.batch_name} has been {decision.lower()}.",
+                notification_type="Course Application"
+            )
 
         AdminCourseApplicationService.create_audit_log(
             reviewed_by_user_id,

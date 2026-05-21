@@ -5,6 +5,7 @@ from app.models.request_status_log import RequestStatusLog
 from app.models.audit_log import AuditLog
 from app.models.user import User
 from app.models.role import Role
+from app.services.notification_service import NotificationService
 
 
 class AdminServiceRequestService:
@@ -119,6 +120,14 @@ class AdminServiceRequestService:
             service_request.resolution_note = note
 
         service_request.status = new_status
+
+        if service_request.student and service_request.student.user_id:
+            NotificationService.create_notification(
+                user_id=service_request.student.user_id,
+                title="Service Request Updated",
+                message=f"Your service request '{service_request.subject}' is now {new_status}.",
+                notification_type="Service Request"
+            )
 
         status_log = RequestStatusLog(
             service_request_id=service_request.id,

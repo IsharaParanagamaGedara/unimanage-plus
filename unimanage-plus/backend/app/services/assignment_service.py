@@ -6,7 +6,9 @@ from flask import current_app
 from app.extensions import db
 from app.models.assignment import Assignment
 from app.models.course_batch import CourseBatch
+from app.models.batch_enrollment import BatchEnrollment
 from app.models.audit_log import AuditLog
+from app.services.notification_service import NotificationService
 
 ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "zip"}
 
@@ -269,6 +271,20 @@ class AssignmentService:
         assignment.review_note = review_note
         assignment.published_by = user_id
         assignment.published_at = datetime.utcnow()
+
+        enrollments = BatchEnrollment.query.filter_by(
+            batch_id=assignment.course_batch_id,
+            enrollment_status="Active"
+        ).all()
+
+        for enrollment in enrollments:
+            if enrollment.student and enrollment.student.user_id:
+                NotificationService.create_notification(
+                    user_id=enrollment.student.user_id,
+                    title="New Assignment Published",
+                    message=f"A new assignment '{assignment.title}' has been published for {batch.batch_code}.",
+                    notification_type="Assignment"
+                )
 
         AssignmentService.create_audit_log(
             user_id,

@@ -9,6 +9,7 @@ from app.models.assignment import Assignment
 from app.models.assignment_submission import AssignmentSubmission
 from app.models.batch_enrollment import BatchEnrollment
 from app.models.audit_log import AuditLog
+from app.services.notification_service import NotificationService
 
 ALLOWED_EXTENSIONS = {"pdf", "docx", "zip"}
 
@@ -180,6 +181,13 @@ class StudentAssignmentService:
 
         db.session.add(submission)
         db.session.flush()
+
+        NotificationService.create_notification(
+            user_id=assignment.created_by,
+            title="New Assignment Submission",
+            message=f"{student.user.first_name} {student.user.last_name} submitted '{assignment.title}'.",
+            notification_type="Submission"
+        )
 
         StudentAssignmentService.create_audit_log(
             user_id,
