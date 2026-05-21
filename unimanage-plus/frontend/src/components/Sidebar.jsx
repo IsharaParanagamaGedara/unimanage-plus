@@ -33,6 +33,7 @@ const linksByRole = {
     { label: "My Enrollments", path: "/student/enrollments", icon: "✅" },
     { label: "Course Materials", path: "/student/materials", icon: "📁" },
     { label: "Assignments", path: "/student/assignments", icon: "📝" },
+    { label: "My Submissions", path: "/student/submissions", icon: "📤" },
     { label: "My Grades", path: "/student/grades", icon: "🎯" },
     { label: "Service Requests", path: "/student/service-requests", icon: "📩" },,
   ],
