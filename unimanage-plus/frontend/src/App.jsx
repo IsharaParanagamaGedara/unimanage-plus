@@ -29,6 +29,7 @@ import LecturerSubmissionsPage from "./pages/lecturer/LecturerSubmissionsPage";
 import LecturerCoursesPage from "./pages/lecturer/LecturerCoursesPage";
 
 import CourseMaterialsPage from "./pages/common/CourseMaterialsPage";
+import NotificationsPage from "./pages/common/NotificationsPage";
 
 const Unauthorized = () => {
   return <h2>Unauthorized Access</h2>;
@@ -338,6 +339,18 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Department Staff"]}>
                 <GradeApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Notifications */}
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute 
+                allowedRoles={["Admin", "Lecturer", "Student", "Department Staff"]}
+              >
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />

@@ -1,0 +1,24 @@
+import api from "./api";
+
+export const getNotifications = async (unreadOnly = false) => {
+  const response = await api.get(
+    `/notifications?unread_only=${unreadOnly}`
+  );
+
+  return response.data.data;
+};
+
+export const getUnreadNotificationCount = async () => {
+  const response = await api.get("/notifications/unread-count");
+  return response.data.data.unread_count;
+};
+
+export const markNotificationAsRead = async (notificationId) => {
+  const response = await api.patch(`/notifications/${notificationId}/read`);
+  return response.data.data;
+};
+
+export const markAllNotificationsAsRead = async () => {
+  const response = await api.patch("/notifications/read-all");
+  return response.data;
+};

@@ -15,6 +15,7 @@ const linksByRole = {
     { label: "Assignments", path: "/admin/assignments", icon: "📝" },
     { label: "Submissions", path: "/admin/submissions", icon: "📤" },
     { label: "Grade Approval", path: "/admin/grade-approval", icon: "✅" },
+    { label: "Notifications", path: "/notifications", icon: "🔔" },
     { label: "Analytics", path: "/admin/analytics", icon: "📊" },
     { label: "Reports", path: "/admin/reports", icon: "📄" },
     { label: "Audit Logs", path: "/admin/audit-logs", icon: "🛡️" },
@@ -25,6 +26,7 @@ const linksByRole = {
     { label: "Course Materials", path: "/lecturer/materials", icon: "📁" },
     { label: "Assignments", path: "/lecturer/assignments", icon: "📝" },
     { label: "Submissions", path: "/lecturer/submissions", icon: "📤" },
+    { label: "Notifications", path: "/notifications", icon: "🔔" },
   ],
   Student: [
     { label: "Dashboard", path: "/student/dashboard", icon: "🏠" },
@@ -35,7 +37,8 @@ const linksByRole = {
     { label: "Assignments", path: "/student/assignments", icon: "📝" },
     { label: "My Submissions", path: "/student/submissions", icon: "📤" },
     { label: "My Grades", path: "/student/grades", icon: "🎯" },
-    { label: "Service Requests", path: "/student/service-requests", icon: "📩" },,
+    { label: "Service Requests", path: "/student/service-requests", icon: "📩" },
+    { label: "Notifications", path: "/notifications", icon: "🔔" },
   ],
   "Department Staff": [
     { label: "Dashboard", path: "/staff/dashboard", icon: "🏠" },
@@ -45,6 +48,7 @@ const linksByRole = {
     { label: "Assignments Review", path: "/staff/assignments", icon: "📝" },
     { label: "Grade Approval", path: "/staff/grade-approval", icon: "✅" },
     { label: "Students", path: "/staff/students", icon: "🎓" },
+    { label: "Notifications", path: "/notifications", icon: "🔔" },
     { label: "Reports", path: "/staff/reports", icon: "📄" },
   ],
 };
