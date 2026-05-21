@@ -59,6 +59,9 @@ def create_app():
     from app.routes.lecturer_course_routes import lecturer_course_bp
     app.register_blueprint(lecturer_course_bp, url_prefix="/api/lecturer")
 
+    from app.routes.notification_routes import notification_bp
+    app.register_blueprint(notification_bp, url_prefix="/api")
+
     @app.route("/api/health")
     def health_check():
         return {
