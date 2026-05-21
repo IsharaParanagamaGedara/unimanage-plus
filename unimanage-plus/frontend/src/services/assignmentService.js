@@ -20,6 +20,7 @@ export const createAssignment = async (formData) => {
   const response = await api.post("/assignments", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+
   return response.data.data;
 };
 
@@ -27,6 +28,7 @@ export const updateAssignment = async (id, formData) => {
   const response = await api.put(`/assignments/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+
   return response.data.data;
 };
 
@@ -43,4 +45,21 @@ export const publishAssignment = async (id, data) => {
 export const updateAssignmentStatus = async (id, data) => {
   const response = await api.patch(`/assignments/${id}/status`, data);
   return response.data.data;
+};
+
+export const downloadAssignmentAttachment = async (assignmentId, fileName) => {
+  const response = await api.get(`/assignments/${assignmentId}/download`, {
+    responseType: "blob",
+  });
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.setAttribute("download", fileName || "assignment-attachment");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.URL.revokeObjectURL(url);
 };

@@ -30,3 +30,20 @@ export const submitGradeForApproval = async (gradeId) => {
   const response = await api.patch(`/lecturer/grades/${gradeId}/submit-approval`);
   return response.data.data;
 };
+
+export const downloadSubmissionFile = async (submissionId, fileName) => {
+  const response = await api.get(`/lecturer/submissions/${submissionId}/download`, {
+    responseType: "blob",
+  });
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.setAttribute("download", fileName || "submission-file");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.URL.revokeObjectURL(url);
+};
