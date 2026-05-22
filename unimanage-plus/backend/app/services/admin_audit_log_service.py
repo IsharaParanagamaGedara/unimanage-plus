@@ -87,7 +87,7 @@ class AdminAuditLogService:
 
     @staticmethod
     def format_log(log):
-        user = log.user if hasattr(log, "user") else None
+        user = User.query.get(log.user_id) if log.user_id else None
 
         return {
             "id": log.id,
