@@ -19,6 +19,8 @@ const linksByRole = {
     { label: "Analytics", path: "/admin/analytics", icon: "📊" },
     { label: "Reports", path: "/admin/reports", icon: "📄" },
     { label: "Audit Logs", path: "/admin/audit-logs", icon: "🛡️" },
+    { label: "My Profile", path: "/profile", icon: "👤" },
+    { label: "Change Password", path: "/change-password", icon: "🔐" },
   ],
   Lecturer: [
     { label: "Dashboard", path: "/lecturer/dashboard", icon: "🏠" },
@@ -27,6 +29,8 @@ const linksByRole = {
     { label: "Assignments", path: "/lecturer/assignments", icon: "📝" },
     { label: "Submissions", path: "/lecturer/submissions", icon: "📤" },
     { label: "Notifications", path: "/notifications", icon: "🔔" },
+    { label: "My Profile", path: "/profile", icon: "👤" },
+    { label: "Change Password", path: "/change-password", icon: "🔐" },
   ],
   Student: [
     { label: "Dashboard", path: "/student/dashboard", icon: "🏠" },
@@ -39,6 +43,8 @@ const linksByRole = {
     { label: "My Grades", path: "/student/grades", icon: "🎯" },
     { label: "Service Requests", path: "/student/service-requests", icon: "📩" },
     { label: "Notifications", path: "/notifications", icon: "🔔" },
+    { label: "My Profile", path: "/profile", icon: "👤" },
+    { label: "Change Password", path: "/change-password", icon: "🔐" },
   ],
   "Department Staff": [
     { label: "Dashboard", path: "/staff/dashboard", icon: "🏠" },
@@ -50,6 +56,8 @@ const linksByRole = {
     { label: "Students", path: "/staff/students", icon: "🎓" },
     { label: "Notifications", path: "/notifications", icon: "🔔" },
     { label: "Reports", path: "/staff/reports", icon: "📄" },
+    { label: "My Profile", path: "/profile", icon: "👤" },
+    { label: "Change Password", path: "/change-password", icon: "🔐" },
   ],
 };
 
