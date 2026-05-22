@@ -16,6 +16,7 @@ import AdminCourseApplicationsPage from "./pages/admin/AdminCourseApplicationsPa
 import AdminServiceRequestsPage from "./pages/admin/AdminServiceRequestsPage";
 import GradeApprovalPage from "./pages/admin/GradeApprovalPage";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
+import AdminReportsPage from "./pages/admin/AdminReportsPage";
 
 import AvailableBatchesPage from "./pages/student/AvailableBatchesPage";
 import MyApplicationsPage from "./pages/student/MyApplicationsPage";
@@ -150,6 +151,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <AdminAnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Reports */}
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminReportsPage />
               </ProtectedRoute>
             }
           />
