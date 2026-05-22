@@ -28,11 +28,18 @@ def get_my_profile():
 @jwt_required()
 def update_my_profile():
     user_id = int(get_jwt_identity())
-    data = request.get_json() or {}
+
+    if request.content_type and request.content_type.startswith("multipart/form-data"):
+        data = request.form
+        file = request.files.get("profile_image")
+    else:
+        data = request.get_json() or {}
+        file = None
 
     result, error = ProfileService.update_my_profile(
         user_id=user_id,
-        data=data
+        data=data,
+        file=file
     )
 
     if error:
