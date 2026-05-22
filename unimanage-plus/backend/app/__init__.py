@@ -65,6 +65,9 @@ def create_app():
     from app.routes.admin_analytics_routes import admin_analytics_bp
     app.register_blueprint(admin_analytics_bp, url_prefix="/api/admin")
 
+    from app.routes.admin_report_routes import admin_report_bp
+    app.register_blueprint(admin_report_bp, url_prefix="/api/admin")
+
     @app.route("/api/health")
     def health_check():
         return {
