@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from app.services.staff_report_service import StaffReportService
+from app.models.course_batch import CourseBatch
 
 staff_report_bp = Blueprint("staff_report", __name__)
 
@@ -28,6 +29,40 @@ def csv_response(csv_file, filename):
             "Content-Disposition": f"attachment; filename={filename}"
         }
     )
+
+
+@staff_report_bp.route("/reports/assigned-batches", methods=["GET"])
+@jwt_required()
+def get_assigned_batches():
+    if not staff_required():
+        return jsonify({
+            "success": False,
+            "message": "Department Staff access required"
+        }), 403
+
+    user_id = int(get_jwt_identity())
+
+    batches = CourseBatch.query.filter_by(coordinator_id=user_id).all()
+
+    result = [
+        {
+            "id": batch.id,
+            "batch_code": batch.batch_code,
+            "batch_name": batch.batch_name,
+            "is_active": batch.is_active,
+            "course": {
+                "id": batch.course.id,
+                "course_code": batch.course.course_code,
+                "course_name": batch.course.course_name,
+            } if batch.course else None
+        }
+        for batch in batches
+    ]
+
+    return jsonify({
+        "success": True,
+        "data": result
+    }), 200
 
 
 @staff_report_bp.route("/reports/<string:report_type>", methods=["GET"])

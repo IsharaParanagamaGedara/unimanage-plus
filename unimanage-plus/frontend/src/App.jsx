@@ -30,6 +30,8 @@ import LecturerAssignmentsPage from "./pages/lecturer/LecturerAssignmentsPage";
 import LecturerSubmissionsPage from "./pages/lecturer/LecturerSubmissionsPage";
 import LecturerCoursesPage from "./pages/lecturer/LecturerCoursesPage";
 
+import StaffReportsPage from "./pages/staff/StaffReportsPage";
+
 import CourseMaterialsPage from "./pages/common/CourseMaterialsPage";
 import NotificationsPage from "./pages/common/NotificationsPage";
 
@@ -315,7 +317,7 @@ function App() {
             }
           />
 
-          {/* Department Course Applications */}
+          {/* Department Staff Course Applications */}
           <Route
             path="/staff/course-applications"
             element={
@@ -325,7 +327,7 @@ function App() {
             }
           />
 
-          {/* Department Service Requests */}
+          {/* Department Staff Service Requests */}
           <Route
             path="/staff/service-requests"
             element={
@@ -335,7 +337,7 @@ function App() {
             }
           />
 
-          {/* Department Course Materials */}
+          {/* Department Staff Course Materials */}
           <Route
             path="/staff/materials"
             element={
@@ -345,7 +347,7 @@ function App() {
             }
           />
 
-          {/* Department Assignments Management */}
+          {/* Department Staff Assignments Management */}
           <Route
             path="/staff/assignments"
             element={
@@ -355,12 +357,22 @@ function App() {
             }
           />
 
-          {/* Department Grade Approval Management */}
+          {/* Department Staff Grade Approval Management */}
           <Route
             path="/staff/grade-approval"
             element={
               <ProtectedRoute allowedRoles={["Department Staff"]}>
                 <GradeApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Department Staff Reports */}
+          <Route
+            path="/staff/reports"
+            element={
+              <ProtectedRoute allowedRoles={["Department Staff"]}>
+                <StaffReportsPage />
               </ProtectedRoute>
             }
           />
