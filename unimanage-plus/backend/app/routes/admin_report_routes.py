@@ -16,6 +16,9 @@ def get_filters():
         "end_date": request.args.get("end_date"),
         "month": request.args.get("month"),
         "year": request.args.get("year"),
+        "department_id": request.args.get("department_id"),
+        "course_id": request.args.get("course_id"),
+        "batch_id": request.args.get("batch_id"),
     }
 
 

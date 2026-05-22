@@ -1,11 +1,14 @@
 import csv
 import io
-from datetime import datetime, date
+from datetime import datetime
 from app.extensions import db
 from app.models.student import Student
+from app.models.course import Course
+from app.models.course_batch import CourseBatch
 from app.models.course_application import CourseApplication
 from app.models.batch_enrollment import BatchEnrollment
 from app.models.service_request import ServiceRequest
+from app.models.assignment import Assignment
 from app.models.assignment_submission import AssignmentSubmission
 from app.models.grade import Grade
 
@@ -21,6 +24,11 @@ class AdminReportService:
             return datetime.strptime(value, "%Y-%m-%d").date()
         except ValueError:
             return None
+
+    @staticmethod
+    def get_filter_value(filters, key):
+        value = filters.get(key) if filters else None
+        return int(value) if value else None
 
     @staticmethod
     def apply_date_filter(query, column, filters):
@@ -62,9 +70,6 @@ class AdminReportService:
             "total_records": len(rows)
         }
 
-    # -------------------------
-    # Student Report
-    # -------------------------
     @staticmethod
     def student_report_data(filters=None):
         filters = filters or {}
@@ -83,12 +88,16 @@ class AdminReportService:
 
         query = Student.query
 
-        if filters:
-            query = AdminReportService.apply_date_filter(
-                query,
-                Student.enrollment_date,
-                filters
-            )
+        department_id = AdminReportService.get_filter_value(filters, "department_id")
+
+        if department_id:
+            query = query.filter(Student.department_id == department_id)
+
+        query = AdminReportService.apply_date_filter(
+            query,
+            Student.enrollment_date,
+            filters
+        )
 
         students = query.order_by(Student.id.desc()).all()
 
@@ -114,9 +123,6 @@ class AdminReportService:
         headers, rows = AdminReportService.student_report_data(filters)
         return AdminReportService.generate_csv(headers, rows)
 
-    # -------------------------
-    # Enrollment Report
-    # -------------------------
     @staticmethod
     def enrollment_report_data(filters=None):
         filters = filters or {}
@@ -134,12 +140,28 @@ class AdminReportService:
 
         query = BatchEnrollment.query
 
-        if filters:
-            query = AdminReportService.apply_date_filter(
-                query,
-                BatchEnrollment.enrolled_at,
-                filters
-            )
+        department_id = AdminReportService.get_filter_value(filters, "department_id")
+        course_id = AdminReportService.get_filter_value(filters, "course_id")
+        batch_id = AdminReportService.get_filter_value(filters, "batch_id")
+
+        if batch_id:
+            query = query.filter(BatchEnrollment.batch_id == batch_id)
+
+        if course_id or department_id:
+            query = query.join(CourseBatch, BatchEnrollment.batch_id == CourseBatch.id)
+
+            if course_id:
+                query = query.filter(CourseBatch.course_id == course_id)
+
+            if department_id:
+                query = query.join(Course, CourseBatch.course_id == Course.id)
+                query = query.filter(Course.department_id == department_id)
+
+        query = AdminReportService.apply_date_filter(
+            query,
+            BatchEnrollment.enrolled_at,
+            filters
+        )
 
         enrollments = query.order_by(BatchEnrollment.enrolled_at.desc()).all()
 
@@ -169,9 +191,6 @@ class AdminReportService:
         headers, rows = AdminReportService.enrollment_report_data(filters)
         return AdminReportService.generate_csv(headers, rows)
 
-    # -------------------------
-    # Course Application Report
-    # -------------------------
     @staticmethod
     def course_application_report_data(filters=None):
         filters = filters or {}
@@ -192,12 +211,28 @@ class AdminReportService:
 
         query = CourseApplication.query
 
-        if filters:
-            query = AdminReportService.apply_date_filter(
-                query,
-                CourseApplication.applied_at,
-                filters
-            )
+        department_id = AdminReportService.get_filter_value(filters, "department_id")
+        course_id = AdminReportService.get_filter_value(filters, "course_id")
+        batch_id = AdminReportService.get_filter_value(filters, "batch_id")
+
+        if batch_id:
+            query = query.filter(CourseApplication.batch_id == batch_id)
+
+        if course_id or department_id:
+            query = query.join(CourseBatch, CourseApplication.batch_id == CourseBatch.id)
+
+            if course_id:
+                query = query.filter(CourseBatch.course_id == course_id)
+
+            if department_id:
+                query = query.join(Course, CourseBatch.course_id == Course.id)
+                query = query.filter(Course.department_id == department_id)
+
+        query = AdminReportService.apply_date_filter(
+            query,
+            CourseApplication.applied_at,
+            filters
+        )
 
         applications = query.order_by(CourseApplication.applied_at.desc()).all()
 
@@ -230,9 +265,6 @@ class AdminReportService:
         headers, rows = AdminReportService.course_application_report_data(filters)
         return AdminReportService.generate_csv(headers, rows)
 
-    # -------------------------
-    # Service Request Report
-    # -------------------------
     @staticmethod
     def service_request_report_data(filters=None):
         filters = filters or {}
@@ -253,12 +285,17 @@ class AdminReportService:
 
         query = ServiceRequest.query
 
-        if filters:
-            query = AdminReportService.apply_date_filter(
-                query,
-                ServiceRequest.submitted_at,
-                filters
-            )
+        department_id = AdminReportService.get_filter_value(filters, "department_id")
+
+        if department_id:
+            query = query.join(Student, ServiceRequest.student_id == Student.id)
+            query = query.filter(Student.department_id == department_id)
+
+        query = AdminReportService.apply_date_filter(
+            query,
+            ServiceRequest.submitted_at,
+            filters
+        )
 
         requests = query.order_by(ServiceRequest.submitted_at.desc()).all()
 
@@ -290,9 +327,6 @@ class AdminReportService:
         headers, rows = AdminReportService.service_request_report_data(filters)
         return AdminReportService.generate_csv(headers, rows)
 
-    # -------------------------
-    # Assignment Submission Report
-    # -------------------------
     @staticmethod
     def assignment_submission_report_data(filters=None):
         filters = filters or {}
@@ -312,12 +346,29 @@ class AdminReportService:
 
         query = AssignmentSubmission.query
 
-        if filters:
-            query = AdminReportService.apply_date_filter(
-                query,
-                AssignmentSubmission.submitted_at,
-                filters
-            )
+        department_id = AdminReportService.get_filter_value(filters, "department_id")
+        course_id = AdminReportService.get_filter_value(filters, "course_id")
+        batch_id = AdminReportService.get_filter_value(filters, "batch_id")
+
+        if department_id or course_id or batch_id:
+            query = query.join(Assignment, AssignmentSubmission.assignment_id == Assignment.id)
+            query = query.join(CourseBatch, Assignment.course_batch_id == CourseBatch.id)
+
+            if batch_id:
+                query = query.filter(CourseBatch.id == batch_id)
+
+            if course_id:
+                query = query.filter(CourseBatch.course_id == course_id)
+
+            if department_id:
+                query = query.join(Course, CourseBatch.course_id == Course.id)
+                query = query.filter(Course.department_id == department_id)
+
+        query = AdminReportService.apply_date_filter(
+            query,
+            AssignmentSubmission.submitted_at,
+            filters
+        )
 
         submissions = query.order_by(AssignmentSubmission.submitted_at.desc()).all()
 
@@ -350,9 +401,6 @@ class AdminReportService:
         headers, rows = AdminReportService.assignment_submission_report_data(filters)
         return AdminReportService.generate_csv(headers, rows)
 
-    # -------------------------
-    # Grade Report
-    # -------------------------
     @staticmethod
     def grade_report_data(filters=None):
         filters = filters or {}
@@ -375,12 +423,30 @@ class AdminReportService:
 
         query = Grade.query
 
-        if filters:
-            query = AdminReportService.apply_date_filter(
-                query,
-                Grade.graded_at,
-                filters
-            )
+        department_id = AdminReportService.get_filter_value(filters, "department_id")
+        course_id = AdminReportService.get_filter_value(filters, "course_id")
+        batch_id = AdminReportService.get_filter_value(filters, "batch_id")
+
+        if department_id or course_id or batch_id:
+            query = query.join(AssignmentSubmission, Grade.submission_id == AssignmentSubmission.id)
+            query = query.join(Assignment, AssignmentSubmission.assignment_id == Assignment.id)
+            query = query.join(CourseBatch, Assignment.course_batch_id == CourseBatch.id)
+
+            if batch_id:
+                query = query.filter(CourseBatch.id == batch_id)
+
+            if course_id:
+                query = query.filter(CourseBatch.course_id == course_id)
+
+            if department_id:
+                query = query.join(Course, CourseBatch.course_id == Course.id)
+                query = query.filter(Course.department_id == department_id)
+
+        query = AdminReportService.apply_date_filter(
+            query,
+            Grade.graded_at,
+            filters
+        )
 
         grades = query.order_by(Grade.graded_at.desc()).all()
 
@@ -417,9 +483,6 @@ class AdminReportService:
         headers, rows = AdminReportService.grade_report_data(filters)
         return AdminReportService.generate_csv(headers, rows)
 
-    # -------------------------
-    # Preview Dispatcher
-    # -------------------------
     @staticmethod
     def get_report_preview(report_type, filters=None):
         report_map = {

@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import {
   getReportPreview,
   downloadFilteredReport,
 } from "../../services/adminReportService";
+import { getDepartments } from "../../services/adminDepartmentService";
+import { getCourses } from "../../services/adminCourseService";
+import { getCourseBatches } from "../../services/adminCourseBatchService";
 import "./AdminReportsPage.css";
 
 const reportOptions = [
@@ -44,12 +47,19 @@ const initialFilters = {
   end_date: "",
   month: "",
   year: "",
+  department_id: "",
+  course_id: "",
+  batch_id: "",
 };
 
 const AdminReportsPage = () => {
   const [selectedReport, setSelectedReport] = useState("students");
   const [filters, setFilters] = useState(initialFilters);
   const [reportData, setReportData] = useState(null);
+
+  const [departments, setDepartments] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [batches, setBatches] = useState([]);
 
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [loadingDownload, setLoadingDownload] = useState(false);
@@ -61,11 +71,56 @@ const AdminReportsPage = () => {
     (report) => report.value === selectedReport
   );
 
+  const loadFilterData = async () => {
+    try {
+      const [departmentData, courseData, batchData] = await Promise.all([
+        getDepartments(),
+        getCourses(),
+        getCourseBatches(),
+      ]);
+
+      setDepartments(departmentData.filter((item) => item.is_active));
+      setCourses(courseData.filter((item) => item.is_active));
+      setBatches(batchData.filter((item) => item.is_active));
+    } catch (err) {
+      setError("Failed to load department, course, or batch filters.");
+    }
+  };
+
+  useEffect(() => {
+    loadFilterData();
+  }, []);
+
+  const filteredCourses = filters.department_id
+    ? courses.filter(
+        (course) => Number(course.department_id) === Number(filters.department_id)
+      )
+    : courses;
+
+  const filteredBatches = filters.course_id
+    ? batches.filter((batch) => Number(batch.course_id) === Number(filters.course_id))
+    : batches;
+
   const handleFilterChange = (e) => {
-    setFilters((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+
+    setFilters((prev) => {
+      const updated = {
+        ...prev,
+        [name]: value,
+      };
+
+      if (name === "department_id") {
+        updated.course_id = "";
+        updated.batch_id = "";
+      }
+
+      if (name === "course_id") {
+        updated.batch_id = "";
+      }
+
+      return updated;
+    });
   };
 
   const clearFilters = () => {
@@ -118,7 +173,9 @@ const AdminReportsPage = () => {
         <div className="page-header-row">
           <div>
             <h1>Reports & Export</h1>
-            <p>Preview report data, apply date filters, and download filtered CSV files.</p>
+            <p>
+              Preview report data, apply date and academic filters, and download filtered CSV files.
+            </p>
           </div>
         </div>
 
@@ -204,6 +261,54 @@ const AdminReportsPage = () => {
                 value={filters.year}
                 onChange={handleFilterChange}
               />
+            </div>
+
+            <div className="form-group">
+              <label>Department</label>
+              <select
+                name="department_id"
+                value={filters.department_id}
+                onChange={handleFilterChange}
+              >
+                <option value="">All Departments</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Course</label>
+              <select
+                name="course_id"
+                value={filters.course_id}
+                onChange={handleFilterChange}
+              >
+                <option value="">All Courses</option>
+                {filteredCourses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_code} - {course.course_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Course Batch</label>
+              <select
+                name="batch_id"
+                value={filters.batch_id}
+                onChange={handleFilterChange}
+              >
+                <option value="">All Batches</option>
+                {filteredBatches.map((batch) => (
+                  <option key={batch.id} value={batch.id}>
+                    {batch.batch_code} - {batch.batch_name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
