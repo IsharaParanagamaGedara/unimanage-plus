@@ -1,73 +1,115 @@
 import { useState } from "react";
 import DashboardLayout from "../../layouts/DashboardLayout";
 import {
-  downloadStudentReport,
-  downloadEnrollmentReport,
-  downloadCourseApplicationReport,
-  downloadServiceRequestReport,
-  downloadSubmissionReport,
-  downloadGradeReport,
+  getReportPreview,
+  downloadFilteredReport,
 } from "../../services/adminReportService";
 import "./AdminReportsPage.css";
 
-const reports = [
+const reportOptions = [
   {
-    title: "Student List Report",
-    description: "Export student profile details, departments, programmes, and year of study.",
-    icon: "🎓",
-    action: downloadStudentReport,
+    value: "students",
+    label: "Student List Report",
+    description: "Student profile details, departments, programmes, and year of study.",
   },
   {
-    title: "Course Enrollment Report",
-    description: "Export approved student enrollments by course, batch, and enrollment status.",
-    icon: "✅",
-    action: downloadEnrollmentReport,
+    value: "enrollments",
+    label: "Course Enrollment Report",
+    description: "Approved student enrollments by course, batch, and enrollment status.",
   },
   {
-    title: "Course Applications Report",
-    description: "Export course batch applications, review statuses, and review notes.",
-    icon: "📝",
-    action: downloadCourseApplicationReport,
+    value: "course-applications",
+    label: "Course Applications Report",
+    description: "Course batch applications, review statuses, and review notes.",
   },
   {
-    title: "Service Request Report",
-    description: "Export service request workflow data, priorities, statuses, assignments, and resolutions.",
-    icon: "📩",
-    action: downloadServiceRequestReport,
+    value: "service-requests",
+    label: "Service Request Report",
+    description: "Service request workflow data, priorities, statuses, assignments, and resolutions.",
   },
   {
-    title: "Assignment Submission Report",
-    description: "Export submitted assignments with course, batch, student, status, and file details.",
-    icon: "📤",
-    action: downloadSubmissionReport,
+    value: "submissions",
+    label: "Assignment Submission Report",
+    description: "Submitted assignments with course, batch, student, status, and file details.",
   },
   {
-    title: "Grade Report",
-    description: "Export grades, marks, feedback, grade status, grading date, and publication date.",
-    icon: "🎯",
-    action: downloadGradeReport,
+    value: "grades",
+    label: "Grade Report",
+    description: "Grades, marks, feedback, grade status, grading date, and publication date.",
   },
 ];
 
+const initialFilters = {
+  start_date: "",
+  end_date: "",
+  month: "",
+  year: "",
+};
+
 const AdminReportsPage = () => {
-  const [loadingReport, setLoadingReport] = useState("");
+  const [selectedReport, setSelectedReport] = useState("students");
+  const [filters, setFilters] = useState(initialFilters);
+  const [reportData, setReportData] = useState(null);
+
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const [loadingDownload, setLoadingDownload] = useState(false);
+
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleDownload = async (report) => {
+  const currentReport = reportOptions.find(
+    (report) => report.value === selectedReport
+  );
+
+  const handleFilterChange = (e) => {
+    setFilters((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters(initialFilters);
+  };
+
+  const handleViewReport = async () => {
     try {
-      setLoadingReport(report.title);
+      setLoadingPreview(true);
       setError("");
       setMessage("");
 
-      await report.action();
+      const data = await getReportPreview(selectedReport, filters);
+      setReportData(data);
 
-      setMessage(`${report.title} downloaded successfully.`);
+      setMessage("Report preview loaded successfully.");
     } catch (err) {
-      setError("Failed to download report.");
+      setError(err?.response?.data?.message || "Failed to load report preview.");
     } finally {
-      setLoadingReport("");
+      setLoadingPreview(false);
     }
+  };
+
+  const handleDownload = async () => {
+    try {
+      setLoadingDownload(true);
+      setError("");
+      setMessage("");
+
+      await downloadFilteredReport(selectedReport, filters);
+
+      setMessage("Filtered CSV report downloaded successfully.");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to download report.");
+    } finally {
+      setLoadingDownload(false);
+    }
+  };
+
+  const handleReportChange = (e) => {
+    setSelectedReport(e.target.value);
+    setReportData(null);
+    setMessage("");
+    setError("");
   };
 
   return (
@@ -76,32 +118,159 @@ const AdminReportsPage = () => {
         <div className="page-header-row">
           <div>
             <h1>Reports & Export</h1>
-            <p>Download CSV reports for academic, workflow, submission, and grading data.</p>
+            <p>Preview report data, apply date filters, and download filtered CSV files.</p>
           </div>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}
         {message && <div className="alert alert-success">{message}</div>}
 
-        <div className="reports-grid">
-          {reports.map((report) => (
-            <div className="report-card" key={report.title}>
-              <div className="report-icon">{report.icon}</div>
-
-              <div className="report-content">
-                <h3>{report.title}</h3>
-                <p>{report.description}</p>
-              </div>
-
-              <button
-                className="download-report-btn"
-                onClick={() => handleDownload(report)}
-                disabled={loadingReport === report.title}
-              >
-                {loadingReport === report.title ? "Downloading..." : "Download CSV"}
-              </button>
+        <div className="report-control-card">
+          <div className="report-selector-row">
+            <div className="form-group">
+              <label>Select Report</label>
+              <select value={selectedReport} onChange={handleReportChange}>
+                {reportOptions.map((report) => (
+                  <option key={report.value} value={report.value}>
+                    {report.label}
+                  </option>
+                ))}
+              </select>
             </div>
-          ))}
+
+            <div className="selected-report-info">
+              <h3>{currentReport?.label}</h3>
+              <p>{currentReport?.description}</p>
+            </div>
+          </div>
+
+          <div className="filter-title-row">
+            <h3>Filters</h3>
+            <button type="button" className="secondary-btn" onClick={clearFilters}>
+              Clear Filters
+            </button>
+          </div>
+
+          <div className="report-filter-grid">
+            <div className="form-group">
+              <label>Start Date</label>
+              <input
+                type="date"
+                name="start_date"
+                value={filters.start_date}
+                onChange={handleFilterChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>End Date</label>
+              <input
+                type="date"
+                name="end_date"
+                value={filters.end_date}
+                onChange={handleFilterChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Month</label>
+              <select
+                name="month"
+                value={filters.month}
+                onChange={handleFilterChange}
+              >
+                <option value="">All Months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Year</label>
+              <input
+                type="number"
+                name="year"
+                placeholder="2026"
+                value={filters.year}
+                onChange={handleFilterChange}
+              />
+            </div>
+          </div>
+
+          <div className="report-actions">
+            <button
+              type="button"
+              className="primary-btn"
+              onClick={handleViewReport}
+              disabled={loadingPreview}
+            >
+              {loadingPreview ? "Loading..." : "View Report"}
+            </button>
+
+            <button
+              type="button"
+              className="download-report-btn"
+              onClick={handleDownload}
+              disabled={loadingDownload}
+            >
+              {loadingDownload ? "Downloading..." : "Download CSV"}
+            </button>
+          </div>
+        </div>
+
+        <div className="report-preview-card">
+          <div className="preview-header">
+            <div>
+              <h3>Report Preview</h3>
+              <p>
+                {reportData
+                  ? `${reportData.total_records} record(s) found.`
+                  : "Select filters and click View Report to preview data."}
+              </p>
+            </div>
+          </div>
+
+          {!reportData ? (
+            <p className="table-message">No report loaded yet.</p>
+          ) : reportData.rows.length === 0 ? (
+            <p className="table-message">No records found for the selected filters.</p>
+          ) : (
+            <div className="table-responsive">
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    {reportData.headers.map((header) => (
+                      <th key={header}>{header}</th>
+                    ))}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {reportData.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, cellIndex) => (
+                        <td key={`${rowIndex}-${cellIndex}`}>
+                          {cell === null || cell === undefined || cell === ""
+                            ? "-"
+                            : String(cell)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

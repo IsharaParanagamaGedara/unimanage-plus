@@ -1,5 +1,16 @@
 import api from "./api";
 
+const buildQueryString = (filters = {}) => {
+  const params = new URLSearchParams();
+
+  if (filters.start_date) params.append("start_date", filters.start_date);
+  if (filters.end_date) params.append("end_date", filters.end_date);
+  if (filters.month) params.append("month", filters.month);
+  if (filters.year) params.append("year", filters.year);
+
+  return params.toString();
+};
+
 const downloadCsv = async (url, fileName) => {
   const response = await api.get(url, {
     responseType: "blob",
@@ -19,20 +30,23 @@ const downloadCsv = async (url, fileName) => {
   window.URL.revokeObjectURL(downloadUrl);
 };
 
-export const downloadStudentReport = () =>
-  downloadCsv("/admin/reports/students/export", "student_list_report.csv");
+export const getReportPreview = async (reportType, filters = {}) => {
+  const queryString = buildQueryString(filters);
+  const url = queryString
+    ? `/admin/reports/${reportType}?${queryString}`
+    : `/admin/reports/${reportType}`;
 
-export const downloadEnrollmentReport = () =>
-  downloadCsv("/admin/reports/enrollments/export", "course_enrollment_report.csv");
+  const response = await api.get(url);
+  return response.data.data;
+};
 
-export const downloadCourseApplicationReport = () =>
-  downloadCsv("/admin/reports/course-applications/export", "course_application_report.csv");
+export const downloadFilteredReport = async (reportType, filters = {}) => {
+  const queryString = buildQueryString(filters);
+  const url = queryString
+    ? `/admin/reports/${reportType}/export?${queryString}`
+    : `/admin/reports/${reportType}/export`;
 
-export const downloadServiceRequestReport = () =>
-  downloadCsv("/admin/reports/service-requests/export", "service_request_report.csv");
+  const fileName = `${reportType.replaceAll("-", "_")}_report.csv`;
 
-export const downloadSubmissionReport = () =>
-  downloadCsv("/admin/reports/submissions/export", "assignment_submission_report.csv");
-
-export const downloadGradeReport = () =>
-  downloadCsv("/admin/reports/grades/export", "grade_report.csv");
+  await downloadCsv(url, fileName);
+};
