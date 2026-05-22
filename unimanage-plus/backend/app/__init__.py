@@ -77,6 +77,9 @@ def create_app():
     from app.routes.profile_routes import profile_bp
     app.register_blueprint(profile_bp, url_prefix="/api/profile")
 
+    from app.routes.dashboard_summary_routes import dashboard_summary_bp
+    app.register_blueprint(dashboard_summary_bp, url_prefix="/api")
+
     @app.route("/api/health")
     def health_check():
         return {
