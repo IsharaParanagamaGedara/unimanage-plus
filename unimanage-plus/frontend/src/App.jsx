@@ -32,6 +32,7 @@ import LecturerSubmissionsPage from "./pages/lecturer/LecturerSubmissionsPage";
 import LecturerCoursesPage from "./pages/lecturer/LecturerCoursesPage";
 
 import StaffReportsPage from "./pages/staff/StaffReportsPage";
+import StaffStudentsPage from "./pages/staff/StaffStudentsPage";
 
 import CourseMaterialsPage from "./pages/common/CourseMaterialsPage";
 import NotificationsPage from "./pages/common/NotificationsPage";
@@ -386,6 +387,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Department Staff"]}>
                 <StaffReportsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Department Staff Students */}
+          <Route
+            path="/staff/students"
+             element={
+              <ProtectedRoute allowedRoles={["Department Staff"]}>
+                <StaffStudentsPage />
               </ProtectedRoute>
             }
           />
