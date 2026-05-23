@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt
 from app.services.admin_analytics_service import AdminAnalyticsService
 
@@ -10,6 +10,18 @@ def admin_required():
     return claims.get("role") == "Admin"
 
 
+def get_filters():
+    return {
+        "department_id": request.args.get("department_id"),
+        "course_id": request.args.get("course_id"),
+        "batch_id": request.args.get("batch_id"),
+        "start_date": request.args.get("start_date"),
+        "end_date": request.args.get("end_date"),
+        "month": request.args.get("month"),
+        "year": request.args.get("year"),
+    }
+
+
 @admin_analytics_bp.route("/analytics/overview", methods=["GET"])
 @jwt_required()
 def get_analytics_overview():
@@ -19,7 +31,7 @@ def get_analytics_overview():
             "message": "Admin access required"
         }), 403
 
-    result = AdminAnalyticsService.get_overview()
+    result = AdminAnalyticsService.get_overview(get_filters())
 
     return jsonify({
         "success": True,

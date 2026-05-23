@@ -19,15 +19,96 @@
   color: var(--muted);
 }
 
-.primary-btn {
+.primary-btn,
+.secondary-btn {
   border: none;
   border-radius: 12px;
   padding: 10px 15px;
   cursor: pointer;
   font-weight: 700;
   font-size: 14px;
+}
+
+.primary-btn {
   background: var(--accent);
   color: white;
+}
+
+.secondary-btn {
+  background: #f1f5f9;
+  color: var(--primary);
+  border: 1px solid var(--border);
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.analytics-filter-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.filter-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.filter-title-row h3 {
+  margin: 0;
+}
+
+.filter-title-row p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.analytics-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 12px;
+  font-size: 14px;
+  outline: none;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
 }
 
 .analytics-kpi-grid {
@@ -107,14 +188,20 @@
   .analytics-chart-grid {
     grid-template-columns: 1fr;
   }
+
+  .analytics-filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 700px) {
-  .page-header-row {
+  .page-header-row,
+  .filter-title-row {
     flex-direction: column;
   }
 
-  .analytics-kpi-grid {
+  .analytics-kpi-grid,
+  .analytics-filter-grid {
     grid-template-columns: 1fr;
   }
 }
