@@ -3,13 +3,18 @@ import "./StatCard.css";
 const StatCard = ({ title, value, subtitle, icon }) => {
   return (
     <div className="stat-card">
-      <div>
-        <p>{title}</p>
-        <h2>{value}</h2>
-        {subtitle && <span>{subtitle}</span>}
+      <div className="stat-card-top">
+        <div>
+          <span className="stat-title">{title}</span>
+          <h2 className="stat-value">{value}</h2>
+        </div>
+
+        <div className="stat-icon-wrapper">
+          <span className="stat-icon">{icon}</span>
+        </div>
       </div>
 
-      <div className="stat-icon">{icon}</div>
+      <p className="stat-subtitle">{subtitle}</p>
     </div>
   );
 };
