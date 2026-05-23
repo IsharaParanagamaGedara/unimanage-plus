@@ -80,6 +80,9 @@ def create_app():
     from app.routes.dashboard_summary_routes import dashboard_summary_bp
     app.register_blueprint(dashboard_summary_bp, url_prefix="/api")
 
+    from app.routes.dashboard_activity_routes import dashboard_activity_bp
+    app.register_blueprint(dashboard_activity_bp, url_prefix="/api")
+
     @app.route("/api/health")
     def health_check():
         return {
